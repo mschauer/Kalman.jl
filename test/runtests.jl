@@ -6,3 +6,4 @@ using StaticArrays
 include("testgenerate.jl")
 include("testfilter.jl")
 include("testsmoother.jl")
+include("testiterator.jl")

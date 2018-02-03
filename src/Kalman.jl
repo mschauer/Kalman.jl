@@ -6,6 +6,9 @@ export LinearHomogSystem, kalmanfilter, kalmanfilter!, kalmanrts, kalmanrts!, ka
 # generate.jl
 export sample, randmvn
 
+# iterator
+export KalmanFilter
+
 include("ellipse.jl")
 
 abstract type StateSpaceModel
@@ -32,7 +35,7 @@ mutable struct LinearHomogSystem{Tx,TP,Ty,TPhi,T3,T4} <: StateSpaceModel
         H::T3 # d₂xd
         R::T4 # d₂xd₂
 end
-
+prior(M) = Gaussian(M.x0, M.P0)
 dims(SSM) = size(SSM.H)
 llikelihood(yres, S, SSM) = logpdf(Gaussian(zero(yres), S), yres)
 
@@ -281,6 +284,8 @@ function kalmanrts(Y::Array{T,3}, M::LinearHomogSystem{Vector{T}}) where {T}
 end
 
 include("generate.jl")
+
+include("iterator.jl")
 
 
 #include("kalmanem.jl")

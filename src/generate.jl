@@ -100,3 +100,8 @@ function sample(n, m, M::LinearHomogSystem{Tx, TP, Ty}) where {Tx, TP, Ty}
 
     return Y, X
 end
+
+function sample(n, M)
+    Y, X = sample(n, 1, M)
+    squeeze(Y, ndims(Y)), squeeze(X, ndims(X))
+end

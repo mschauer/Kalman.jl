@@ -1,5 +1,5 @@
 include("testsystem1.jl")
-srand(11)
+srand(12)
 Y, X = sample(20, 100, M)
 
 function testmean(X, μ)
