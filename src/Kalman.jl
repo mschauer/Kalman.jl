@@ -7,7 +7,7 @@ export LinearHomogSystem, kalmanfilter, kalmanfilter!, kalmanrts, kalmanrts!, ka
 export sample, randmvn
 
 # iterator
-export KalmanFilter
+export KalmanFilter, TimedKalmanFilter
 
 include("ellipse.jl")
 
