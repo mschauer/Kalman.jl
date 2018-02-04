@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/mschauer/Kalman.jl.svg?branch=master)](https://travis-ci.org/mschauer/Kalman.jl)
 
+[![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://mschauer.github.io/Kalman.jl/latest/)
+
 
 # Kalman
 
@@ -7,13 +9,9 @@
 
 For the state space system
 
-\[
-x[k] = \Phi x[k−1] + b + w[k], \quad w[k] \sim N(0, Q)
-\]
-
-\[
-y[k] = H x[k] + v[k],  \quad v[k] \sim N(0, R)
-\]
+    x[k] = Φx[k−1] + b + w[k],    w[k] ∼ N(0, Q)
+ 
+    y[k] = Hx[k] + v[k],    v[k] ∼ N(0, R)
 
 define
 
