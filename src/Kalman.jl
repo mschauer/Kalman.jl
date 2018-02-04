@@ -3,11 +3,14 @@ module Kalman
 using Distributions, GaussianDistributions
 export LinearHomogSystem, kalmanfilter, kalmanfilter!, kalmanrts, kalmanrts!, kalmanEM
 
-# generate.jl
+# generate
 export sample, randmvn
 
 # iterator
 export KalmanFilter, TimedKalmanFilter
+
+# track
+export track
 
 include("ellipse.jl")
 
@@ -287,6 +290,7 @@ include("generate.jl")
 
 include("iterator.jl")
 
+include("track.jl")
 
 #include("kalmanem.jl")
 
