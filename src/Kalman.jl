@@ -18,10 +18,38 @@ abstract type StateSpaceModel
 end
 
 
-"""
-    LinearHomogSystem
+doc"""
+```
+LinearHomogSystem <: StateSpaceModel
 
-Linear dynamical model with linear observation scheme
+LinearHomogSystem(x0, P0, Phi, b, Q, y, H, R)
+```
+
+Time homogeneous linear dynamical model with linear observation scheme corresponding to
+
+$ x[k] = Φx[k−1] + b + w[k],    w[k] ∼ N(0, Q) $
+
+$ y[k] = Hx[k] + v[k],    v[k] ∼ N(0, R) $
+
+The argument `y` to the constructor is a dummy variable with the same type and `size` 
+as the observations.
+
+# Example
+
+```
+x0 = [1., 0.]
+P0 = eye(2)
+
+Phi = [0.8 0.2; 0.0 0.8]
+b = zeros(2)
+Q = [0.1 0.0; 0.0 1.0]
+
+y = [NaN]
+H = [1.0 0.0]
+R = eye(1)
+M = LinearHomogSystem(x0, P0, Phi, b, Q, y, H, R)
+```
+
 """
 mutable struct LinearHomogSystem{Tx,TP,Ty,TPhi,T3,T4} <: StateSpaceModel
         # Initial x1 ~ N(x0, P0)   
@@ -42,32 +70,54 @@ prior(M) = Gaussian(M.x0, M.P0)
 dims(SSM) = size(SSM.H)
 llikelihood(yres, S, SSM) = logpdf(Gaussian(zero(yres), S), yres)
 
-"""
-    predict!(s, x, P, t, M::LinearHomogSystem) -> x, Ppred, Phi
+doc"""
+    predict!(s, x, P, t, M) -> x, Ppred, Phi
+
+Computes predicted state `x` and predicted covariance of model `M` according 
+the prediction equations
+
+$P_{pred} = \Phi P \Phi' + Q$
+
+Also returns evolution operator / Jacobian `Phi`.
 """
 function predict!(s, x, P, t, M::LinearHomogSystem)
-    x = M.Phi*x + M.b
+    x = evolve(s, x, P, t, M)
     Ppred = M.Phi*P*M.Phi' + M.Q
     x, Ppred, M.Phi
 end
 
-"""
-    evolve(s, x, P, t, M::LinearHomogSystem) -> x
+doc"""
+    evolve(s, x, P, t, M) -> x
+
+Evolve state `x` according to the state dynamics of model `M`
+without noise, usually 
+
+$ x \mapsto \Phi x + b. $
 """
 function evolve(s, x, P, t, M::LinearHomogSystem)
     M.Phi*x + M.b
-    x
 end
 
 """
-    observe!(s, x, P, t, y, M::LinearHomogSystem) -> t, y, H, R
+    observe!(s, x, P, t, y, M) -> t, y, H, R
+
+Obtain observation time `t`, observation `y`, observation matrix `H`
+and observation covariance `H` using model `M`. Except for certain use cases this is 
+a no-op on arguments `t` and `y` (but needs to return `t` and `y` nevertheless.)
 """
 function observe!(s, x, P, t, Y, M::LinearHomogSystem)
     t, Y, M.H, M.R
 end
 
 """
-    correct!(x, Ppred, y, H, R, SSM) -> x, P, yres, S, K
+    correct!(x, Ppred, y, H, R, M) -> x, P, yres, S, K
+
+Perform the Kalman correction step using state space model `M`.
+Inputs are predicted state `x` and predicted covariance, as well as observation `y`
+and observation matrix `H`, observation covariance `R`.
+
+Outputs filtered state `x`, filtered state covariance `P`, residual `y`
+as well as innovation covariance `S` and Kalman gain `K`.
 """
 function correct!(x, Ppred, y, H, R, SSM)
     yres = y - H*x # innovation residual
@@ -84,7 +134,10 @@ end
 """
     kalman_kernel(s, x, P, t, Y, SSM) -> t, x, P, Ppred, ll, K
 
-Single Kalman filter step.
+Single Kalman filter step consisting of a prediction step `predict!`, an observation step `observe!`
+and a correction step `correct!`. Return filtered covariance `P` and predicted `Ppred`
+
+Computes and returns as well the log likelihood of the residual and the Kalman gain.
 """
 function kalman_kernel(s, x, P, t, Y, SSM)
    

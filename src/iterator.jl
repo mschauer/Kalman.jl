@@ -5,6 +5,13 @@ import Base: start, next, done, iteratorsize, iteratoreltype, length
 
 Kalman filter as iterator, iterating over `Gaussian`s representing
 the filtered distribution of `x`. Arguments `y` iterates over signal values.
+
+# Example
+
+```
+kf = KalmanFilter(Y, M) #
+est = collect(kf)
+```
 """
 struct KalmanFilter{Tit,TM}
     it::Tit

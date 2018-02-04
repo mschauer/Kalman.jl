@@ -4,13 +4,12 @@
 
 EM procedure for the state space model (Shumway, Stoffer)
 
-    yy -- data
-    M1 -- initial model
-    maxit -- maximum number of iterations
-    tol -- rel. tolerance for test for convergence of marginal likelihood
+- yy -- data
+- M1 -- initial model
+- maxit -- maximum number of iterations
+- tol -- rel. tolerance for test for convergence of marginal likelihood
 
-
-    xxhat, Mhat -- smoothed process with estimated model
+- xxhat, Mhat -- smoothed process with estimated model
 """
 function kalmanEM(yy, M::LinearHomogSystem, maxit = 500, tol = 0.001) 
 
