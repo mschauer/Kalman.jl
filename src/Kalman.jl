@@ -66,6 +66,9 @@ function observe!(s, x, P, t, Y, M::LinearHomogSystem)
     t, Y, M.H, M.R
 end
 
+"""
+    correct!(x, Ppred, y, H, R, SSM) -> x, P, yres, S, K
+"""
 function correct!(x, Ppred, y, H, R, SSM)
     yres = y - H*x # innovation residual
 
@@ -77,7 +80,12 @@ function correct!(x, Ppred, y, H, R, SSM)
     x, P, yres, S, K
 end
 
-# single Kalman filter step
+
+"""
+    kalman_kernel(s, x, P, t, Y, SSM) -> t, x, P, Ppred, ll, K
+
+Single Kalman filter step.
+"""
 function kalman_kernel(s, x, P, t, Y, SSM)
    
     x, Ppred, Phi = predict!(s, x, P, t, SSM)

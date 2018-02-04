@@ -1,5 +1,11 @@
 import Base: start, next, done, iteratorsize, iteratoreltype, length
 
+"""
+    KalmanFilter(y, M)
+
+Kalman filter as iterator, iterating over `Gaussian`s representing
+the filtered distribution of `x`. Arguments `y` iterates over signal values.
+"""
 struct KalmanFilter{Tit,TM}
     it::Tit
     M::TM
@@ -21,6 +27,13 @@ done(kf::KalmanFilter, state) = done(kf.it, state[1])
 
 length(kf::KalmanFilter) = length(kf.it)
 
+"""
+    TimedKalmanFilter(ty, M)
+
+Kalman filter as iterator, iterating over `Gaussian`s representing
+the filtered distribution of `x`. `ty` iterates over pairs `(t, y)` 
+of signal time and signal value.
+"""
 struct TimedKalmanFilter{Tit,TM}
     it::Tit
     M::TM

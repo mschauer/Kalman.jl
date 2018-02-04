@@ -1,6 +1,6 @@
 import Distributions.sample
 
-""" 
+#= 
     randmvn(S)
 
 Sampling singular semidefinite multivariate normal distributions ``x ~ N(0, A)``
@@ -11,7 +11,7 @@ x = randmvn(S)
 ```
 
 
-"""
+=#
 randmvn(S) = ipermute!(S[:L]*permute!(randn(size(S,1)),S[:p]), S[:p])
 
 function randmvn(S::Base.LinAlg.CholeskyPivoted, n) 
