@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Kalman.jl",
     "category": "section",
-    "text": "A Julia package for fast, flexible filtering and smoothing."
+    "text": "A Julia package for fast, flexible filtering and smoothing.At the moment implements the vanilla Kalman filter, but the layout allows for easy extension. I took some effort to allow for interoperability with StaticArrays and ForwardDiff.See the Library tab for the assorted documentation."
 },
 
 {
@@ -129,11 +129,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "library.html#Kalman.KalmanFilter",
+    "page": "Library",
+    "title": "Kalman.KalmanFilter",
+    "category": "Type",
+    "text": "KalmanFilter(y, M)\n\nKalman filter as iterator, iterating over Gaussians representing the filtered distribution of x. Arguments y iterates over signal values.\n\nExample\n\nkf = KalmanFilter(Y, M) #\nest = collect(kf)\n\n\n\n"
+},
+
+{
+    "location": "library.html#Kalman.MappedKalmanFilter",
+    "page": "Library",
+    "title": "Kalman.MappedKalmanFilter",
+    "category": "Type",
+    "text": "MappedKalmanFilter(ty, M, f)\n\nKalman filter with model M as iterator, iterating over the result ret of ret = f(t, x, P, Ppred, ll, K). ty iterates over pairs (t, y)  of signal time and signal value.\n\nEltype is determined by calling mappedreturntype(::typeof(f)) with fallback any.\n\nExample\n\nf(t, x, P, Ppred, ll, K) = ll\nkf = MappedKalmanFilter(zip(Base.Iterators.countfrom(1), Y), M, f)\nll = sum(kf)\n\nFor performance, define:\n\nimport Kalman: mappedreturntype\nKalman.mappedreturntype(_, ::Type{typeof(f)}) = Float64\n\n\n\n"
+},
+
+{
     "location": "library.html#Iterators-1",
     "page": "Library",
     "title": "Iterators",
     "category": "section",
-    "text": "Kalman.KalmanFilter\nKalman.TimedKalmanFilter"
+    "text": "Kalman.KalmanFilter\nKalman.MappedKalmanFilter"
 },
 
 {
