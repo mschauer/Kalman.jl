@@ -7,7 +7,7 @@ export LinearHomogSystem, kalmanfilter, kalmanfilter!, kalmanrts, kalmanrts!, ka
 export sample, randmvn
 
 # iterator
-export KalmanFilter, TimedKalmanFilter
+export KalmanFilter, MappedKalmanFilter
 
 # track
 export track

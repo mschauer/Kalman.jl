@@ -1,4 +1,4 @@
-import Base: start, next, done, iteratorsize, iteratoreltype, length
+import Base: start, next, done, iteratorsize, iteratoreltype, eltype, length
 
 """
     KalmanFilter(y, M)
@@ -19,7 +19,8 @@ struct KalmanFilter{Tit,TM}
 end
 
 Base.iteratorsize(::KalmanFilter{Tit}) where {Tit} = Base.iteratorsize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit) 
-Base.iteratoreltype(::KalmanFilter{Tit, LinearHomogSystem{Tx, TP}}) where {Tit, Tx, TP} = Gaussian{Tx,TP}
+Base.iteratoreltype(::KalmanFilter) = Base.HasEltype()
+Base.eltype(::Type{KalmanFilter{Tit, T}}) where {Tit, T<:LinearHomogSystem{Tx, TP}} where {Tx, TP} = Gaussian{Tx,TP}
 
 start(kf::KalmanFilter) = start(kf.it), prior(kf.M)
 function next(kf::KalmanFilter, state)
@@ -34,32 +35,52 @@ done(kf::KalmanFilter, state) = done(kf.it, state[1])
 
 length(kf::KalmanFilter) = length(kf.it)
 
-"""
-    TimedKalmanFilter(ty, M)
 
-Kalman filter as iterator, iterating over `Gaussian`s representing
-the filtered distribution of `x`. `ty` iterates over pairs `(t, y)` 
-of signal time and signal value.
 """
-struct TimedKalmanFilter{Tit,TM}
+    MappedKalmanFilter(ty, M, f)
+
+Kalman filter with model `M` as iterator, iterating over the result `ret` of
+`ret = f(t, x, P, Ppred, ll, K)`. `ty` iterates over pairs `(t, y)` 
+of signal time and signal value.
+
+Eltype is determined by calling `mappedreturntype(::typeof(f))`
+with fallback any.
+
+# Example
+```
+f(t, x, P, Ppred, ll, K) = ll
+kf = MappedKalmanFilter(zip(Base.Iterators.countfrom(1), Y), M, f)
+ll = sum(kf)
+```
+
+For performance, define:
+```
+import Kalman: mappedreturntype
+Kalman.mappedreturntype(_, ::Type{typeof(f)}) = Float64
+```
+"""
+struct MappedKalmanFilter{Tit,TM,F}
     it::Tit
     M::TM
+    f::F
 end
 
-Base.iteratorsize(::TimedKalmanFilter{Tit}) where {Tit} = Base.iteratorsize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit) 
-Base.iteratoreltype(::TimedKalmanFilter{Tit, LinearHomogSystem{Tx, TP}}) where {Tit, Tx, TP} = Gaussian{Tx,TP}
+Base.iteratorsize(::MappedKalmanFilter{Tit}) where {Tit} = Base.iteratorsize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit) 
+Base.iteratoreltype(::MappedKalmanFilter) = Base.HasEltype()
+Base.eltype(::Type{MappedKalmanFilter{Tit, TM, F}}) where {Tit, TM, F} = mappedreturntype(TM, F)
+mappedreturntype(TM, F) = Any
 
-start(kf::TimedKalmanFilter) = start(kf.it), -Inf, prior(kf.M)
-function next(kf::TimedKalmanFilter, state)
+start(kf::MappedKalmanFilter) = start(kf.it), -Inf, prior(kf.M)
+function next(kf::MappedKalmanFilter, state)
     st, s, N = state
 
     ty, st2 = next(kf.it, st)
     t, y = ty
-    t, x, P = kalman_kernel(s, mean(N), cov(N), t, y, kf.M)
-    N2 = Gaussian(x, P)
-    N2, (st2, t, N2)
+    t, x, P, Ppred, ll, K = kalman_kernel(s, mean(N), cov(N), t, y, kf.M)  
+    ret = kf.f(t, x, P, Ppred, ll, K)
+    ret, (st2, t, Gaussian(x, P))
 end
 
-done(kf::TimedKalmanFilter, state) = done(kf.it, state[1])
+done(kf::MappedKalmanFilter, state) = done(kf.it, state[1])
 
-length(kf::TimedKalmanFilter) = length(kf.it)
+length(kf::MappedKalmanFilter) = length(kf.it)
