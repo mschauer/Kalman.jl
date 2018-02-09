@@ -27,7 +27,7 @@ Kalman.kalmanrts
 ## Iterators
 ```@docs
 Kalman.KalmanFilter
-Kalman.TimedKalmanFilter
+Kalman.MappedKalmanFilter
 ```
 
 ## Tracking
