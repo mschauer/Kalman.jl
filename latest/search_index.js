@@ -129,22 +129,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "library.html#Kalman.KalmanFilter",
-    "page": "Library",
-    "title": "Kalman.KalmanFilter",
-    "category": "Type",
-    "text": "KalmanFilter(y, M)\n\nKalman filter as iterator, iterating over Gaussians representing the filtered distribution of x. Arguments y iterates over signal values.\n\nExample\n\nkf = KalmanFilter(Y, M) #\nest = collect(kf)\n\n\n\n"
-},
-
-{
-    "location": "library.html#Kalman.TimedKalmanFilter",
-    "page": "Library",
-    "title": "Kalman.TimedKalmanFilter",
-    "category": "Type",
-    "text": "TimedKalmanFilter(ty, M)\n\nKalman filter as iterator, iterating over Gaussians representing the filtered distribution of x. ty iterates over pairs (t, y)  of signal time and signal value.\n\n\n\n"
-},
-
-{
     "location": "library.html#Iterators-1",
     "page": "Library",
     "title": "Iterators",
