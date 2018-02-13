@@ -25,3 +25,6 @@ M2 = tostatic(M)
 
 include("testsystem.jl")
 Y, X = sample(20, 100, M)
+
+# Reproducibility
+@test sample(MersenneTwister(1), 5, 5, M) == sample(MersenneTwister(1), 5, 5, M)
