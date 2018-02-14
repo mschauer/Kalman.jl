@@ -166,7 +166,7 @@ Kalman filter
 function kalmanfilter(yy::AbstractMatrix, M::LinearHomogSystem) 
     d = size(M.Phi, 1)
     n = size(yy, 2)
-    kalmanfilter!(1:n, yy, zeros(d, n), zeros(d, d, n), zeros(d, d, n), M) 
+    kalmanfilter!(0:n, yy, zeros(d, n), zeros(d, d, n), zeros(d, d, n), M)
 end
 
 """
