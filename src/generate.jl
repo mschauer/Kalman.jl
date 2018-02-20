@@ -90,7 +90,7 @@ function sample(rng::AbstractRNG, n, m, M::LinearHomogSystem{Tx, TP, Ty}) where 
     for j in 1:m
         x = rand(rng, Nx0)
         V = rand(rng, Nv, (n,))
-        W = rand(rng, Nv, (n,))
+        W = rand(rng, Nw, (n,))
         X[1, j] = Phi*x + b + W[1]
         Y[1, j] = H*x + V[1]
         for i in 2:n
