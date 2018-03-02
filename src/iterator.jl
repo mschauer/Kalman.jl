@@ -26,7 +26,7 @@ start(kf::KalmanFilter) = start(kf.it), prior(kf.M)
 function next(kf::KalmanFilter, state)
     st, N = state
     y, st2 = next(kf.it, st)
-    _, x, P = kalman_kernel(0.0, mean(N), cov(N), 1.0, y, kf.M)
+    _, x, P = kalman_kernel(0.0, mean(N), cov(N), 1.0, y, kf.M.H, kf.M)
     N2 = Gaussian(x, P)
     N2, (st2, N2)
 end
@@ -76,7 +76,7 @@ function next(kf::MappedKalmanFilter, state)
 
     ty, st2 = next(kf.it, st)
     t, y = ty
-    t, x, P, Ppred, ll, K = kalman_kernel(s, mean(N), cov(N), t, y, kf.M)  
+    t, x, P, Ppred, ll, K = kalman_kernel(s, mean(N), cov(N), t, y, kf.M.H, kf.M)
     ret = kf.f(t, x, P, Ppred, ll, K)
     ret, (st2, t, Gaussian(x, P))
 end

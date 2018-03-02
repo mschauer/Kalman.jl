@@ -105,8 +105,8 @@ Obtain observation time `t`, observation `y`, observation matrix `H`
 and observation covariance `H` using model `M`. Except for certain use cases this is 
 a no-op on arguments `t` and `y` (but needs to return `t` and `y` nevertheless.)
 """
-function observe!(s, x, P, t, Y, M::LinearHomogSystem)
-    t, Y, M.H, M.R
+function observe!(s, x, P, t, Y, H, M::LinearHomogSystem)
+    t, Y, H, M.R
 end
 
 """
@@ -139,11 +139,11 @@ and a correction step `correct!`. Return filtered covariance `P` and predicted `
 
 Computes and returns as well the log likelihood of the residual and the Kalman gain.
 """
-function kalman_kernel(s, x, P, t, Y, SSM)
+function kalman_kernel(s, x, P, t, Y, H, SSM)
    
     x, Ppred, Phi = predict!(s, x, P, t, SSM)
 
-    t, y, H, R = observe!(s, x, P, t, Y, SSM)
+    t, y, H, R = observe!(s, x, P, t, Y, H, SSM)
 
     x, P, yres, S, K = correct!(x, Ppred, y, H, R, SSM)
 
@@ -163,10 +163,10 @@ Kalman filter
     ll -- marginal likelihood
     xxf -- filtered process
 """
-function kalmanfilter(yy::AbstractMatrix, M::LinearHomogSystem) 
+function kalmanfilter(yy::AbstractMatrix, M::LinearHomogSystem, HH=nothing) 
     d = size(M.Phi, 1)
     n = size(yy, 2)
-    kalmanfilter!(0:n, yy, zeros(d, n), zeros(d, d, n), zeros(d, d, n), M)
+    kalmanfilter!(0:n, yy, zeros(d, n), zeros(d, d, n), zeros(d, d, n), M, HH)
 end
 
 """
@@ -179,7 +179,7 @@ Stack Kalman filter
     X -- filtered processes (dxnxm array)
     ll -- product marginal log likelihood
 """ 
-function kalmanfilter(Y::AbstractArray{T,3}, M::LinearHomogSystem) where {T}
+function kalmanfilter(Y::AbstractArray{T,3}, M::LinearHomogSystem, HH=nothing) where {T}
     d₂, n, m= size(Y)
     d = length(M.x0)
     X = zeros(d,n,m)
@@ -187,25 +187,28 @@ function kalmanfilter(Y::AbstractArray{T,3}, M::LinearHomogSystem) where {T}
     PPpred = zeros(d, d, n)
     ll = 0.
     for j in 1:m
-        ll += kalmanfilter!(0:n, view(Y, :, :, j), view(X, :, :, j),  PP, PPpred, M)[4]
+        ll += kalmanfilter!(0:n, view(Y, :, :, j), view(X, :, :, j),  PP, PPpred, M, HH)[4]
     end
     ll, X
 end
 
 # Matrix-of-vectors-version
-function kalmanfilter(Y::AbstractMatrix{Ty}, M::LinearHomogSystem{Tx,TP,Ty}) where {Tx,TP,Ty}
+function kalmanfilter(Y::AbstractMatrix{Ty}, M::LinearHomogSystem{Tx,TP,Ty}, HH=nothing) where {Tx,TP,Ty}
     n, m = size(Y)
     X = zeros(Tx, n, m)
     PP = zeros(TP, n)
     PPpred = zeros(TP, n)
     ll = 0.
     for j in 1:m
-        ll += kalmanfilter!(0:n, view(Y, :, j), view(X, :, j),  PP, PPpred, M)[4]
+        ll += kalmanfilter!(0:n, view(Y, :, j), view(X, :, j),  PP, PPpred, M, HH)[4]
     end
     ll, X
 end
 
-function kalmanfilter!(tt, yy, xxf, PP, PPpred, M::LinearHomogSystem{Vector{T}}) where {T} 
+pick_H(::Void, M, i) = M.H
+pick_H(HH, M, i) = @view HH[:, :, i]
+
+function kalmanfilter!(tt, yy, xxf, PP, PPpred, M::LinearHomogSystem{Vector{T}}, HH=nothing) where {T} 
 
     d₂, d = dims(M)
     assert(ndims(yy) == 2)
@@ -218,14 +221,14 @@ function kalmanfilter!(tt, yy, xxf, PP, PPpred, M::LinearHomogSystem{Vector{T}})
     t = tt[1]
 
     for i in 1:n # t, x, P, Ppred, ll, K = kalman_kernel(s, x, P, t, Y, SSM)
-        t, xf, P, Ppred, l, _ = kalman_kernel(t, xf, P, tt[i+1], yy[.., i], M)
+        t, xf, P, Ppred, l, _ = kalman_kernel(t, xf, P, tt[i+1], yy[.., i], pick_H(HH, M, i), M)
         xxf[.., i], PP[.., i], PPpred[.., i] = xf, P, Ppred                
         ll += l
     end
     xxf, PP, PPpred, ll
 end
 
-function kalmanfilter!(tt, yy, xxf, PP, PPpred, M::LinearHomogSystem) 
+function kalmanfilter!(tt, yy, xxf, PP, PPpred, M::LinearHomogSystem, HH=nothing) 
 
     n = size(yy, 1)
    
@@ -236,7 +239,7 @@ function kalmanfilter!(tt, yy, xxf, PP, PPpred, M::LinearHomogSystem)
     t = tt[1]
 
     for i in 1:n # t, x, P, Ppred, ll, K = kalman_kernel(s, x, P, t, Y, SSM)
-        t, xf, P, Ppred, l, _ = kalman_kernel(t, xf, P, tt[i+1], yy[i], M)
+        t, xf, P, Ppred, l, _ = kalman_kernel(t, xf, P, tt[i+1], yy[i], pick_H(HH, M, i), M)
         xxf[i], PP[i], PPpred[i] = xf, P, Ppred                
         ll += l
     end
@@ -292,7 +295,7 @@ function kalmanrts(yy::Matrix, M::LinearHomogSystem{Vector{T}}) where {T}
     kalmanrts!(yy, zeros(d, n), zeros(d, d, n), zeros(d, d, n), M)
 end
 
-function kalmanrts!(yy, xx, PP, PPpred, M::LinearHomogSystem{Vector{T}}) where {T}  # using Rauch-Tung-Striebel
+function kalmanrts!(yy, xx, PP, PPpred, M::LinearHomogSystem{Vector{T}}, HH=nothing) where {T}  # using Rauch-Tung-Striebel
     d₂, d = size(M.H)
     assert(ndims(yy) == 2)
     n = size(yy,2)
@@ -302,7 +305,7 @@ function kalmanrts!(yy, xx, PP, PPpred, M::LinearHomogSystem{Vector{T}}) where {
     # in place! xx = xxf = xxs
     # PP = PPf = PPs
       
-    xx, PP, PPpred, ll = kalmanfilter!(0:n, yy, xx, PP, PPpred, M) 
+    xx, PP, PPpred, ll = kalmanfilter!(0:n, yy, xx, PP, PPpred, M, HH) 
     
     # backwards pass
     Phi, b = M.Phi, M.b
