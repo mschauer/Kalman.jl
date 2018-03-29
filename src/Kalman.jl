@@ -1,7 +1,9 @@
 module Kalman
 
 using Distributions, GaussianDistributions
-export LinearHomogSystem, kalmanfilter, kalmanfilter!, kalmanrts, kalmanrts!, kalmanEM
+export LinearHomogSystem, LinearStateSpaceModel, AbstractObservation, AbstractEvolution
+
+export  kalmanfilter, kalmanfilter!, kalmanrts, kalmanrts!, kalmanEM
 
 # generate
 export sample, randmvn
@@ -12,10 +14,33 @@ export KalmanFilter, MappedKalmanFilter
 # track
 export track
 
+# input
+export GenericLinearObservation, GenericLinearEvolution, LinearObservation, LinearEvolution
+
 include("ellipse.jl")
 
 abstract type StateSpaceModel
 end
+
+abstract type AbstractObservation
+end
+
+abstract type AbstractEvolution
+end
+
+
+
+struct LinearStateSpaceModel{Tsys,Tobs, Tprior} <: StateSpaceModel
+    sys::Tsys
+    obs::Tobs
+    prior::Tprior
+end
+predict!(s, x, P, t, U, M::LinearStateSpaceModel) = predict!(s, x, P, t, U, M.sys)
+
+predict!(s, x, P, t, M::LinearStateSpaceModel) = predict!(s, x, P, t, M.sys)
+observe!(s, x, P, t, Y, M::LinearStateSpaceModel) = observe!(s, x, P, t, Y, M.obs)
+prior(M::LinearStateSpaceModel) = M.prior
+
 
 
 doc"""
@@ -166,7 +191,7 @@ Kalman filter
 function kalmanfilter(yy::AbstractMatrix, M::LinearHomogSystem) 
     d = size(M.Phi, 1)
     n = size(yy, 2)
-    kalmanfilter!(0:n, yy, zeros(d, n), zeros(d, d, n), zeros(d, d, n), M)
+    kalmanfilter!(1:n, yy, zeros(d, n), zeros(d, d, n), zeros(d, d, n), M) 
 end
 
 """
@@ -352,6 +377,8 @@ include("generate.jl")
 include("iterator.jl")
 
 include("track.jl")
+
+include("input.jl")
 
 #include("kalmanem.jl")
 
