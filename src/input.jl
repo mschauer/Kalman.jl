@@ -58,39 +58,39 @@ Computes and returns as well the log likelihood of the residual and the Kalman g
 """
 function kalman_kernel(s, x, P, t, U, Y, SSM)
    
-    x, Ppred, Phi = predict!(s, x, P, t, U, SSM)
+    xpred, Ppred, Phi, b = predict!(s, x, P, t, U, SSM)
 
-    t, y, H, R = observe!(s, x, P, t, Y, SSM)
+    t, y, H, R = observe!(s, xpred, P, t, Y, SSM)
 
-    x, P, yres, S, K = correct!(x, Ppred, y, H, R, SSM)
+    x, P, yres, S, K = correct!(xpred, Ppred, y, H, R, SSM)
 
     ll = llikelihood(yres, S, SSM)
     
-    t, x, P, Ppred, ll, K
+    t, x, P, xpred, Ppred, ll, K
 end
 
 """
-    kalmanfilter!(tt, uu, yy, xxf, PP, PPpred, M)
+    kalmanfilter!(tt, uu, yy, xx, PP, xxpred, PPpred, M)
 
 Filter obserations in place.
-`tt` are time `n` (sic!) observation time points, `uu` are `n` control inputs and 
+`tt` are `n` (sic!) observation time points, `uu` are `n` control inputs and 
 `yy` are `n` (generalized) observations (depending on context either vectors or matrices with `size(yy, 2) == n` etc.)
 """
-function kalmanfilter!(tt, uu, yy, xxf, PP, PPpred, M) 
+function kalmanfilter!(tt, uu, yy, xx, PP, xxpred, PPpred, M) 
     n = length(tt)
 
-    xf = mean(prior(M))
+    x = mean(prior(M))
     P = cov(prior(M))
     
     ll = 0.0  
     t = tt[1]
 
     for i in 1:n 
-        t, xf, P, Ppred, l, _ = kalman_kernel(t, xf, P, tt[i], uu[.., i], yy[.., i], M)
-        xxf[.., i], PP[.., i], PPpred[.., i] = xf, P, Ppred                
+        t, x, P, xpred, Ppred, l, _ = kalman_kernel(t, x, P, tt[i], uu[.., i], yy[.., i], M)
+        xx[.., i], PP[.., i], xxpred[.., i], PPpred[.., i] = x, P, xpred, Ppred                
         ll += l
     end
-    xxf, PP, PPpred, ll
+    xx, PP, xxpred, PPpred, ll
 end
 
 
