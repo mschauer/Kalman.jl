@@ -28,7 +28,7 @@ matrix:
 
 ## uncomment the following lines to override the default test script
 script:
-  - julia -e 'Pkg.clone("https://github.com/mschauer/DynamicIterators.jl");  Pkg.build("DynamicIterators"); Pkg.clone(pwd()); Pkg.build("Kalman"); Pkg.test("Kalman"; coverage=true)'
+  - julia -e 'using Pkg; Pkg.clone("https://github.com/mschauer/DynamicIterators.jl");  Pkg.build("DynamicIterators"); Pkg.clone(pwd()); Pkg.build("Kalman"); Pkg.test("Kalman"; coverage=true)'
 
 
 after_success:
