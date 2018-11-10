@@ -4,6 +4,14 @@ using Distributions, GaussianDistributions
 using Trajectories, DynamicIterators
 using Random, LinearAlgebra
 
+import DynamicIterators: evolve, dyniterate
+
+#const G = Gaussian
+
+export LinearEvolution
+include("evolution.jl")
+
+#=
 import Distributions: sample
 
 export LinearHomogSystem, LinearStateSpaceModel, AbstractObservation, AbstractEvolution
@@ -162,5 +170,5 @@ include("iterator.jl")
 include("track.jl")
 
 #include("kalmanem.jl")
-
+=#
 end # module

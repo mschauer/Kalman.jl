@@ -4,12 +4,17 @@ using StaticArrays
 using Random, LinearAlgebra
 using Distributions
 using GaussianDistributions
+using DynamicIterators
+using Trajectories
+
 #include(joinpath("..", "docs", "make.jl"))
 
-# write your own tests here
-include("testgenerate.jl")
-include("testfilter.jl")
-include("testsmoother.jl")
-include("testiterator.jl")
-include("testtrack.jl")
-include("testinput.jl")
+include("testevolution.jl")
+
+
+#include("testgenerate.jl")
+#include("testfilter.jl")
+#include("testsmoother.jl")
+#include("testiterator.jl")
+#include("testtrack.jl")
+#include("testinput.jl")
