@@ -1,4 +1,5 @@
 
+
 struct GenericLinearObservation <: AbstractObservation
 end
 struct GenericLinearEvolution{TPhi,Tb,TQ} <: AbstractEvolution
@@ -9,9 +10,8 @@ end
 
 Evolution `x -> Phi x + b + w` where ``w ~ N(0, Q)``
 """
-struct LinearEvolution{TPhi,Tb,TQ} <: AbstractEvolution
+struct LinearEvolution{TPhi,TQ} <: AbstractEvolution
     Phi::TPhi # dxd
-    b::Tb # d
     Q::TQ # dxd
 end
 
@@ -25,18 +25,35 @@ struct LinearObservation{TH, TR} <: AbstractObservation
     R::TR # d
 end
 
+LinearHomogSystem(G0, Phi, Q, H, R) = LinearStateSpaceModel(G0, LinearEvolution(Phi, Q), LinearObservation(H, R))
+
+function evolve(rng, s, x, t, M::LinearEvolution)
+    @assert t-s == 1
+    M.Phi*x + rand(rng, M.Q)
+end
+
+sample(t, x, M) = sample(Base.GLOBAL_RNG, t, x, M)
+
+function sample(rng::AbstractRNG, t, x, M) 
+    xx = [x]
+    for i in 2:length(t)
+        x = evolve(rng, t[i-1], x, t[i], M)
+        push!(xx, x)
+    end
+    t, xx
+end
 
 function predict!(s, G::T, t, u, M) where {T}
     if s == t # if `s == t` no time has passed
         G(mean(G) + u, cov(P)), one(M.Phi)
     else
-        G(M.Phi*mean(G) + M.b + u, M.Phi*cov(G)*M.Phi' + M.Q), M.Phi
+        G(M.Phi*mean(G) + mean(M.Q) + u, M.Phi*cov(G)*M.Phi' + cov(M.Q)), M.Phi
     end
 end
 
 function predict!(s, t, U, M::GenericLinearEvolution) 
-    Phi, b, Q = U # unpack generic input
-    G(Phi*mean(G) + b, Phi*cov(G)*Phi' + Q), Phi
+    Phi, Q = U # unpack generic input
+    G(Phi*mean(G) + mean(Q), Phi*cov(G)*Phi' + cov(Q)), Phi
 end
 
 function observe!(s, t, Y, M::GenericLinearObservation)

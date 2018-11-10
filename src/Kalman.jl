@@ -1,7 +1,7 @@
 module Kalman
 
 using Distributions, GaussianDistributions
-#using Trajectories, DynamicIterators
+using Trajectories, DynamicIterators
 using Random, LinearAlgebra
 
 import Distributions: sample
