@@ -5,15 +5,7 @@ end
 struct GenericLinearEvolution{TPhi,Tb,TQ} <: AbstractEvolution
 end
 
-"""
-    LinearEvolution(Phi, b, Q)
 
-Evolution `x -> Phi x + b + w` where ``w ~ N(0, Q)``
-"""
-struct LinearEvolution{TPhi,TQ} <: AbstractEvolution
-    Phi::TPhi # dxd
-    Q::TQ # dxd
-end
 
 """
     LinearObservation(H, R)
@@ -34,7 +26,7 @@ end
 
 sample(t, x, M) = sample(Base.GLOBAL_RNG, t, x, M)
 
-function sample(rng::AbstractRNG, t, x, M) 
+function sample(rng::AbstractRNG, t, x, M)
     xx = [x]
     for i in 2:length(t)
         x = evolve(rng, t[i-1], x, t[i], M)
@@ -51,7 +43,7 @@ function predict!(s, G::T, t, u, M) where {T}
     end
 end
 
-function predict!(s, t, U, M::GenericLinearEvolution) 
+function predict!(s, t, U, M::GenericLinearEvolution)
     Phi, Q = U # unpack generic input
     G(Phi*mean(G) + mean(Q), Phi*cov(G)*Phi' + cov(Q)), Phi
 end
@@ -74,7 +66,7 @@ and a correction step `correct!` with input `U`. Return filtered covariance `P` 
 Computes and returns as well the log likelihood of the residual and the Kalman gain.
 """
 function kalman_kernel(s, G, t, U, Y, SSM)
-   
+
     Gpred, Phi, b = predict!(s, G, t, U, SSM)
 
     t, y, H, R = observe!(s, t, Y, SSM)
@@ -82,7 +74,7 @@ function kalman_kernel(s, G, t, U, Y, SSM)
     G, yres, S, K = correct!(Gpred, y, H, R, SSM)
 
     ll = llikelihood(yres, S, SSM)
-    
+
     t, G, Gpred, ll, K
 end
 
@@ -90,23 +82,21 @@ end
     kalmanfilter!(tt, uu, yy, xx, PP, xxpred, PPpred, M)
 
 Filter obserations in place.
-`tt` are `n` (sic!) observation time points, `uu` are `n` control inputs and 
+`tt` are `n` (sic!) observation time points, `uu` are `n` control inputs and
 `yy` are `n` (generalized) observations (depending on context either vectors or matrices with `size(yy, 2) == n` etc.)
 """
-function kalmanfilter!(tt, uu, yy, GG, GGpred, M) 
+function kalmanfilter!(tt, uu, yy, GG, GGpred, M)
     n = length(tt)
 
     G = prior(M)
 
-    ll = 0.0  
+    ll = 0.0
     t = tt[1]
 
-    for i in 1:n 
+    for i in 1:n
         t, G, Gpred, l, _ = kalman_kernel(t, G, tt[i], uu[.., i], yy[.., i], M)
-        GG[i], GGpred[i] = G, Gpred                
+        GG[i], GGpred[i] = G, Gpred
         ll += l
     end
     GG, GGpred, ll
 end
-
-

@@ -6,6 +6,8 @@ using Random, LinearAlgebra
 
 import DynamicIterators: evolve, dyniterate
 
+import Random.rand
+
 #const G = Gaussian
 
 export LinearEvolution

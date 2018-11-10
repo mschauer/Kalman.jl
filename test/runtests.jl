@@ -9,6 +9,8 @@ using Trajectories
 
 #include(joinpath("..", "docs", "make.jl"))
 
+Random.seed!(1)
+
 include("testevolution.jl")
 
 

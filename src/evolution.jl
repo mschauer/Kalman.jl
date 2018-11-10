@@ -14,3 +14,7 @@ evolve(M::LinearEvolution, u::Pair) = timelift_evolve(M, u)
 function evolve(M::LinearEvolution, G::Gaussian)
     Gaussian(M.Φ*mean(G) + mean(M.Q), M.Φ*cov(G)*M.Φ' + cov(M.Q))
 end
+
+function evolve(M::LinearEvolution, x)
+    Gaussian(M.Φ*x + mean(M.Q), cov(M.Q))
+end
