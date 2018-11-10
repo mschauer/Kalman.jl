@@ -1,9 +1,9 @@
-import Base: start, next, done, iteratorsize, iteratoreltype, eltype, length
+import Base: iterate, IteratorSize, IteratorEltype, eltype, length
 
 """
-    KalmanFilter(y, M)
+    KalmanFilter(x0, y, M)
 
-Kalman filter as iterator, iterating over `Gaussian`s representing
+Kalman filter as iterator, iterating over `Gaussian`s or `Distributions` representing
 the filtered distribution of `x`. Arguments `y` iterates over signal values.
 
 # Example
@@ -18,20 +18,28 @@ struct KalmanFilter{Tit,TM}
     M::TM
 end
 
-Base.iteratorsize(::KalmanFilter{Tit}) where {Tit} = Base.iteratorsize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit) 
-Base.iteratoreltype(::KalmanFilter) = Base.HasEltype()
-Base.eltype(::Type{KalmanFilter{Tit, T}}) where {Tit, T<:LinearHomogSystem{Tx, TP}} where {Tx, TP} = Gaussian{Tx,TP}
+Base.IteratorSize(::KalmanFilter{Tit}) where {Tit} = Base.IteratorSize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit) 
+Base.IteratorEltype(::KalmanFilter) = Base.HasEltype()
+Base.eltype(::Type{KalmanFilter{Tit,TM}}) where {Tit,TM} = eltype(TM)
 
-start(kf::KalmanFilter) = start(kf.it), prior(kf.M)
-function next(kf::KalmanFilter, state)
-    st, N = state
-    y, st2 = next(kf.it, st)
-    _, x, P = kalman_kernel(0.0, mean(N), cov(N), 1.0, y, kf.M)
-    N2 = Gaussian(x, P)
-    N2, (st2, N2)
+
+function iterate(kf::KalmanFilter)
+    G = prior(kf.M)
+    ϕ = iterate(kf.it)
+    ϕ === nothing && return nothing
+    y, st = ϕ
+    _, G = kalman_kernel(0.0, G, 0.0, y, kf.M)
+    G, (st, G)
 end
 
-done(kf::KalmanFilter, state) = done(kf.it, state[1])
+function iterate(kf::KalmanFilter, state)
+    st, G = state
+    ϕ = iterate(kf.it, st)
+    ϕ === nothing && return nothing
+    y, st2 = ϕ
+    _, G = kalman_kernel(0.0, G, 1.0, y, kf.M)
+    G, (st2, G)
+end
 
 length(kf::KalmanFilter) = length(kf.it)
 
@@ -71,15 +79,27 @@ Base.iteratoreltype(::MappedKalmanFilter) = Base.HasEltype()
 Base.eltype(::Type{MappedKalmanFilter{Tit, TM, F}}) where {Tit, TM, F} = mappedreturntype(TM, F)
 mappedreturntype(TM, F) = Any
 
-start(kf::MappedKalmanFilter) = start(kf.it), kf.t0, prior(kf.M)
-function next(kf::MappedKalmanFilter, state)
-    st, s, N = state
+start(kf::MappedKalmanFilter) = 
 
-    tuy, st2 = next(kf.it, st)
+function iterate(kf::MappedKalmanFilter)
+    s, G = kf.t0, prior(kf.M)
+    ϕ = iterate(kf.it)
+    ϕ === nothing && return nothing
+    tuy, st2 = ϕ
     t, u, y = tuy
-    t, x, P, Ppred, ll, K = kalman_kernel(s, mean(N), cov(N), t, u, y, kf.M)  
-    ret = kf.f(t, x, P, Ppred, u, ll, K)
-    ret, (st2, t, Gaussian(x, P))
+    t, G, Gpred, ll, K = kalman_kernel(s, G, t, u, y, kf.M)  
+    ret = kf.f(t, G, Gpred, u, ll, K)
+    ret, (st2, t, G)
+end
+function next(kf::MappedKalmanFilter, state)
+    st, s, G = state
+    ϕ = iterate(kf.it, st)
+    ϕ === nothing && return nothing
+    tuy, st2 = ϕ
+    t, u, y = tuy
+    t, G, Gpred, ll, K = kalman_kernel(s, G, t, u, y, kf.M)  
+    ret = kf.f(t, G, Gpred, u, ll, K)
+    ret, (st2, t, G)
 end
 
 done(kf::MappedKalmanFilter, state) = done(kf.it, state[1])
