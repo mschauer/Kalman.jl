@@ -8,6 +8,8 @@ struct LinearEvolution{TΦ,TQ} <: Evolution
     Φ::TΦ # dxd
     Q::TQ # dxd
 end
+struct GenericLinearEvolution <: Evolution
+end
 
 evolve(M::LinearEvolution, u::Pair) = timelift_evolve(M, u)
 
@@ -17,4 +19,10 @@ end
 
 function evolve(M::LinearEvolution, x)
     Gaussian(M.Φ*x + mean(M.Q), cov(M.Q))
+end
+
+
+function evolve(M::GenericLinearEvolution, G, (control,)::Control)
+    Φ, Q = control
+    G(Φ*mean(G) + mean(Q), Φ*cov(G)*Φ' + cov(Q))
 end

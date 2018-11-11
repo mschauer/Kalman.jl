@@ -11,6 +11,7 @@ import Random.rand
 #const G = Gaussian
 
 export LinearEvolution
+include("observation.jl")
 include("evolution.jl")
 
 #=

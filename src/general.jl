@@ -1,21 +1,8 @@
 
 
-struct GenericLinearObservation <: AbstractObservation
-end
 struct GenericLinearEvolution{TPhi,Tb,TQ} <: AbstractEvolution
 end
 
-
-
-"""
-    LinearObservation(H, R)
-
-Observe `y = Hx + v` where ``v ~ N(0, R)``
-"""
-struct LinearObservation{TH, TR} <: AbstractObservation
-    H::TH # dxd
-    R::TR # d
-end
 
 LinearHomogSystem(G0, Phi, Q, H, R) = LinearStateSpaceModel(G0, LinearEvolution(Phi, Q), LinearObservation(H, R))
 
