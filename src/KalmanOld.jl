@@ -4,25 +4,6 @@ using Distributions, GaussianDistributions
 using Trajectories, DynamicIterators
 using Random, LinearAlgebra
 
-import DynamicIterators: evolve, dyniterate
-
-import Random.rand
-
-meancov(G) = mean(G), cov(G)
-meancov(G::Tuple) = G
-
-export LinearObservation, GenericLinearObservation, Observation
-include("observation.jl")
-
-export LinearEvolution, Evolution
-include("evolution.jl")
-
-include("filter.jl")
-include("smoother.jl")
-include("backwardsampler.jl")
-
-
-#=
 import Distributions: sample
 
 export LinearHomogSystem, LinearStateSpaceModel, AbstractObservation, AbstractEvolution
@@ -35,16 +16,31 @@ export sample, randmvn
 # iterator
 export KalmanFilter, MappedKalmanFilter
 
+# track
+export track
+
 # input
 export GenericLinearObservation, GenericLinearEvolution, LinearObservation, LinearEvolution
 
 include("ellipse.jl")
+
+meancov(G) = mean(G), cov(G)
+meancov(G::Tuple) = G
 
 
 
 abstract type StateSpaceModel
 end
 
+
+abstract type AbstractEvolution
+end
+abstract type FilterMethod
+end
+struct JosephForm <: FilterMethod
+end
+struct SimpleKalman <: FilterMethod
+end
 """
 ```
 LinearStateSpaceModel <: StateSpaceModel
@@ -99,26 +95,6 @@ function correct!(method::JosephForm, SSM::LinearStateSpaceModel{T}, Gpred, y, H
     T(x, P), yres, S, K
 end
 
-"""
-    kalman_kernel(s, G, t, Y, SSM) -> t, G, Ppred, ll, K
-
-Single Kalman filter step consisting of a prediction step `predict!`, an observation step `observe!`
-and a correction step `correct!`. Return filtered covariance `P` and predicted `Ppred`
-
-Computes and returns as well the log likelihood of the residual and the Kalman gain.
-"""
-function kalman_kernel(s, G, t, Y, SSM)
-
-    Gpred, Phi = predict!(s, G, t, SSM)
-
-    t, y, H, R = observe!(s, t, Y, SSM)
-
-    G, yres, S, K = correct!(Gpred, y, H, R, SSM)
-
-    ll = llikelihood(yres, S, SSM)
-
-    t, G, Ppred, ll, K
-end
 
 
 function smoother_kernel(Gs::T, Gf, Ppred, Phi, b) where {T}
@@ -138,20 +114,6 @@ function smoother_kernel(Gs::T, Gf, Ppred, Phi, b) where {T}
     T(xs, Ps), J
 end
 
-function backward_kernel(Gs::T, Gf, Ppred, Phi, b) where T
-    # x -- previous
-    # Ps -- previous
-    # xf -- xxf[:, i]
-    # Pf -- PPf[:, :, i]
-    # Ppred -- PPpred[:, :, i+1]
-    xs, Ps = meancov(Gs)
-    xf, Pf = meancov(Gf)
-
-    J = Pf*Phi'/Ppred
-    xs = xf +  J*(x - (Phi*xf  + b))
-    Ps = Pf - J*Ppred*J' # as Ppred = M.Phi*P*M.Phi' + M.Q
-    T(xs, Ps), J
-end
 
 
 
@@ -164,5 +126,5 @@ include("iterator.jl")
 include("track.jl")
 
 #include("kalmanem.jl")
-=#
+
 end # module

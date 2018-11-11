@@ -12,6 +12,7 @@ using Trajectories
 Random.seed!(1)
 
 include("testevolution.jl")
+include("testobservation.jl")
 
 
 #include("testgenerate.jl")
