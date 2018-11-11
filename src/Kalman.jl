@@ -5,6 +5,7 @@ using Trajectories, DynamicIterators
 using Random, LinearAlgebra
 
 import DynamicIterators: evolve, dyniterate
+import Base: iterate, IteratorSize, IteratorEltype, eltype, length
 
 import Random.rand
 
@@ -16,6 +17,8 @@ include("observation.jl")
 
 export LinearEvolution, Evolution
 include("evolution.jl")
+
+include("statespacemodel.jl")
 
 include("filter.jl")
 include("smoother.jl")

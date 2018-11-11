@@ -1,3 +1,5 @@
+
+
 abstract type FilterMethod
 end
 struct JosephForm <: FilterMethod
@@ -37,3 +39,47 @@ function kalman_kernel(s, G, t, Y, SSM)
 
     t, G, Ppred, ll, K
 end
+
+
+"""
+    KalmanFilter(x0, y, M)
+
+Kalman filter as iterator, iterating over `Gaussian`s or `Distributions` representing
+the filtered distribution of `x`. Arguments `y` iterates over signal values.
+
+# Example
+
+```
+kf = KalmanFilter(Y, M) #
+est = collect(kf)
+```
+"""
+struct KalmanFilter{Tit,TM}
+    it::Tit
+    M::TM
+end
+
+Base.IteratorSize(::KalmanFilter{Tit}) where {Tit} = Base.IteratorSize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit)
+Base.IteratorEltype(::KalmanFilter) = Base.HasEltype()
+Base.eltype(::Type{KalmanFilter{Tit,TM}}) where {Tit,TM} = eltype(TM)
+
+
+function iterate(kf::KalmanFilter)
+    G = prior(kf.M)
+    ϕ = iterate(kf.it)
+    ϕ === nothing && return nothing
+    y, st = ϕ
+    _, G = kalman_kernel(0.0, G, 0.0, y, kf.M)
+    G, (st, G)
+end
+
+function iterate(kf::KalmanFilter, state)
+    st, G = state
+    ϕ = iterate(kf.it, st)
+    ϕ === nothing && return nothing
+    y, st2 = ϕ
+    _, G = kalman_kernel(0.0, G, 1.0, y, kf.M)
+    G, (st2, G)
+end
+
+length(kf::KalmanFilter) = length(kf.it)
