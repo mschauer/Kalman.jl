@@ -41,12 +41,12 @@ Return filtered state `t => (x, P)` and predicted `(xpred, Ppred)`.
 
 Computes and returns as well the log likelihood of the residual.
 """
-function dyniterate(M::StateSpaceModel, (s, u)::Pair, (c,)::Control)
+function dyniterate(M::StateSpaceModel, (s, (u,ll))::Pair, (c,)::Control)
     t, y = c
     t, upred = evolve(M.sys, s => u, t)
     u, yres, S = correct(M, upred, y)
-    ll = llikelihood(M, yres, S)
-    (t => (u, upred, ll)), t => u
+    llᵒ = llikelihood(M, yres, S)
+    (t => (u, upred, ll + llᵒ)), t => (u, ll + llᵒ)
 end
 
 function dyniterate(M::StateSpaceModel, ::Nothing, (value, c)::NamedTuple{(:value, :control)})
@@ -55,7 +55,7 @@ function dyniterate(M::StateSpaceModel, ::Nothing, (value, c)::NamedTuple{(:valu
     t, upred = evolve(M.sys, s => u, t)
     u, yres, S = correct(M, upred, y)
     ll = llikelihood(M, yres, S)
-    (t => (u, upred, ll)), t => u
+    (t => (u, upred, ll)), t => (u, ll)
 end
 
 #=

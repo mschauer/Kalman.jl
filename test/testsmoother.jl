@@ -40,10 +40,13 @@ F = [GaussianDistributions.conditional(Gaussian(μ, Σ), 1:i, (1:i).+n, v[1:i]) 
 μs = mean(F[n])
 Σs = diag(cov(F[n]))
 
-
+o = (1:n).+n
+ll2 = logpdf(Gaussian(μ[o], Σ[o, o]), v)
 
 @test μf ≈ mean.(values(Xf))
 @test Σf ≈ cov.(values(Xf))
 
 @test μs ≈ mean.(values(Xs))
-@show Σf ≈ cov.(values(Xs))
+@test Σs ≈ cov.(values(Xs))
+
+@test ll ≈ ll2
