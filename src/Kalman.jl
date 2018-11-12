@@ -23,6 +23,8 @@ include("statespacemodel.jl")
 
 export kalmanfilter
 include("filter.jl")
+
+export rts_smoother
 include("smoother.jl")
 include("backwardsampler.jl")
 

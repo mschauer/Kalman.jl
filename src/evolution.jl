@@ -8,6 +8,9 @@ struct LinearEvolution{TΦ,TQ} <: Evolution
     Φ::TΦ # dxd
     Q::TQ # dxd
 end
+Phi(M::LinearEvolution, ::Any) = M.Φ
+Phi(M::LinearEvolution) = M.Φ
+
 struct GenericLinearEvolution <: Evolution
 end
 
