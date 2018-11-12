@@ -35,8 +35,8 @@ struct LinearStateSpaceModel{Tsys,Tobs} <: StateSpaceModel
     obs::Tobs
 end
 
-function evolve(SSM::LinearStateSpaceModel, (t, U)::Pair{<:Any, <:Gaussian})
-    t, x = evolve(SSM.sys, t => U.x)
+function evolve(SSM::LinearStateSpaceModel, (t, x)::Pair{<:Any, <:Gaussian})
+    t, x = evolve(SSM.sys, t => x)
     t => StateObs(x, SSM.obs)
 end
 
@@ -45,11 +45,6 @@ function evolve(SSM::LinearStateSpaceModel, (t, (x,y))::Pair{<:Any, <:Tuple})
     t => StateObs(x, SSM.obs)
 end
 
-predict!(s, G, t, U, M::LinearStateSpaceModel) = predict!(s, G, t, U, M.sys)
-predict!(s, G, t, M::LinearStateSpaceModel) = predict!(s, G, t, M.sys)
-
-observe!(s, t, Y, M::LinearStateSpaceModel) = observe!(s, t, Y, M.obs)
-
 dims(SSM) = size(SSM.H)
 
-llikelihood(yres, S, SSM) = logpdf(Gaussian(zero(yres), S), yres)
+llikelihood(SSM, yres, S) = logpdf(Gaussian(zero(yres), S), yres)

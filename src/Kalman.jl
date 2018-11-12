@@ -21,6 +21,7 @@ include("evolution.jl")
 export LinearStateSpaceModel, StateObs
 include("statespacemodel.jl")
 
+export kalmanfilter
 include("filter.jl")
 include("smoother.jl")
 include("backwardsampler.jl")

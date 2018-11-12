@@ -2,25 +2,12 @@
 include("testsystem.jl")
 Random.seed!(11)
 x = rand(StateObs(Gaussian(x0, P0), M.obs))
-Y = trace(Sample(M), 0 => x, endtime(100))
-
-@show Y
+X = trace(Sample(M), 0 => x, endtime(100))
 
 
-#kf = KalmanFilter(Y, M)
 
-#@test eltype(kf) === GaussianDistributions.Gaussian{Float64,Float64}
-#@test length(kf) == n
-#est = trace(kf)
+@show X
 
-#=
-include("testsystem1.jl")
-srand(11)
-Y, X = sample(20, 100, M)
-kalmanfilter(Y, M)
-
-include("testsystem.jl")
-srand(11)
-Y, X = sample(20, 100, M)
-kalmanfilter(Y, M)
-=#
+Y = collect(t=>y for (t, (x,y)) in pairs(X))
+kf = kalmanfilter(M)
+@show trace(kf(Y), 0 => Gaussian(x0, P0), endtime(200), register = ((i, x),) -> i > 0)

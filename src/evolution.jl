@@ -12,6 +12,7 @@ struct GenericLinearEvolution <: Evolution
 end
 
 evolve(M::LinearEvolution, u::Pair) = timelift_evolve(M, u)
+evolve(M::LinearEvolution, u::Pair, c) = timelift_evolve(M, u, c)
 
 function evolve(M::LinearEvolution, G::Gaussian)
     Gaussian(M.Φ*mean(G) + mean(M.Q), M.Φ*cov(G)*M.Φ' + cov(M.Q))
