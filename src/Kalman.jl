@@ -18,6 +18,7 @@ include("observation.jl")
 export LinearEvolution, Evolution
 include("evolution.jl")
 
+export LinearStateSpaceModel, StateObs
 include("statespacemodel.jl")
 
 include("filter.jl")

@@ -54,17 +54,17 @@ kf = KalmanFilter(Y, M) #
 est = collect(kf)
 ```
 """
-struct KalmanFilter{Tit,TM}
+struct KalmanFilter{Tit,TM} <: DynamicIterator
     it::Tit
     M::TM
 end
 
-Base.IteratorSize(::KalmanFilter{Tit}) where {Tit} = Base.IteratorSize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit)
-Base.IteratorEltype(::KalmanFilter) = Base.HasEltype()
-Base.eltype(::Type{KalmanFilter{Tit,TM}}) where {Tit,TM} = eltype(TM)
+#Base.IteratorSize(::KalmanFilter{Tit}) where {Tit} = Base.IteratorSize(Tit) == Base.HasShape() ? Base.HasLength() : Base.iteratorsize(Tit)
+#Base.IteratorEltype(::KalmanFilter) = Base.HasEltype()
+#Base.eltype(::Type{KalmanFilter{Tit,TM}}) where {Tit,TM} = eltype(TM)
 
 
-function iterate(kf::KalmanFilter)
+function dyniterate(kf::KalmanFilter)
     G = prior(kf.M)
     ϕ = iterate(kf.it)
     ϕ === nothing && return nothing
@@ -73,7 +73,7 @@ function iterate(kf::KalmanFilter)
     G, (st, G)
 end
 
-function iterate(kf::KalmanFilter, state)
+function dyniterate(kf::KalmanFilter, state)
     st, G = state
     ϕ = iterate(kf.it, st)
     ϕ === nothing && return nothing

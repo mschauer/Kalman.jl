@@ -15,3 +15,6 @@ struct LinearObservation{TH, TR} <: Observation
     H::TH # dxd
     R::TR # d
 end
+
+(O::LinearObservation)((x, P)::G) where {G} = G(O.H*x, O.H*P*O.H' + O.R)
+(O::LinearObservation)((x, P)::Gaussian) = Gaussian(O.H*x, O.H*P*O.H' + O.R)
