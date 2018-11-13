@@ -1,12 +1,7 @@
 
-abstract type StateSpaceModel <: Evolution
+abstract type StateSpaceModel <: DynamicIterator
 end
 
-#=struct BiBlock{T1,T21,T22}
-    L1::T1
-    L21::T21
-    L22::T22
-end=#
 
 struct StateObs{T,S}
     x::T
@@ -23,12 +18,13 @@ end
 ```
 LinearStateSpaceModel <: StateSpaceModel
 
-LinearStateSpaceModel(sys, obs, prior)
+LinearStateSpaceModel(sys, obs)
 ```
 
-Combines a linear system `sys`, an observations model `obs` and
-a `prior` to a linear statespace model in a modular way. See [LinearHomogSystem`](@ref)
-for a "batteries included" complete linear system.
+Combines a linear system `sys` and an observations model `obs` and
+to a linear statespace model in a modular way.
+
+Evolves StateObs objects.
 """
 struct LinearStateSpaceModel{Tsys,Tobs} <: StateSpaceModel
     sys::Tsys
@@ -48,3 +44,14 @@ end
 dims(SSM) = size(SSM.H)
 
 llikelihood(SSM, yres, S) = logpdf(Gaussian(zero(yres), S), yres)
+
+
+# fixme: not really clear if being an evolution means that also controlled
+# objects are evolutions
+
+#=
+function evolve(M::StateSpaceModel, u::Pair, v::Pair)
+    _, U = dyniterate(M, u, (observation = v,))
+    u
+end
+=#

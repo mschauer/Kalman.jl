@@ -4,15 +4,21 @@ using Distributions, GaussianDistributions
 using Trajectories, DynamicIterators
 using Random, LinearAlgebra
 
-import DynamicIterators: evolve, dyniterate
+import DynamicIterators: evolve, dyniterate, @returnnothing
 import Base: iterate, IteratorSize, IteratorEltype, eltype, length
 
 import Random.rand
 
 meancov(G) = mean(G), cov(G)
 meancov(G::Tuple) = G
+const Observe = NamedTuple{(:observation,)}
 
-export LinearObservation, GenericLinearObservation, Observation
+macro NT(args...)
+    :(NamedTuple{($(args)...,)})
+end
+
+
+export LinearObservation, GenericLinearObservation, Observation, Observe
 include("observation.jl")
 
 export LinearEvolution, Evolution
@@ -28,6 +34,7 @@ export rts_smoother
 include("smoother.jl")
 include("backwardsampler.jl")
 
+include("combinator.jl")
 
 #=
 import Distributions: sample

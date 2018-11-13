@@ -1,5 +1,4 @@
 
-
 abstract type FilterMethod
 end
 struct JosephForm <: FilterMethod
@@ -41,17 +40,17 @@ Return filtered state `t => (x, P)` and predicted `(xpred, Ppred)`.
 
 Computes and returns as well the log likelihood of the residual.
 """
-function dyniterate(M::StateSpaceModel, (s, (u,ll))::Pair, (c,)::Control)
-    t, y = c
+function dyniterate(M::StateSpaceModel, (s, (u,ll))::Pair, (v,)::Observe)
+    t, y = v
     t, upred = evolve(M.sys, s => u, t)
     u, yres, S = correct(M, upred, y)
     llᵒ = llikelihood(M, yres, S)
     (t => (u, upred, ll + llᵒ)), t => (u, ll + llᵒ)
 end
 
-function dyniterate(M::StateSpaceModel, ::Nothing, (value, c)::NamedTuple{(:value, :control)})
+function dyniterate(M::StateSpaceModel, ::Nothing, (value, v)::NamedTuple{(:value, :observation)})
     s, u = value
-    t, y = c
+    t, y = v
     t, upred = evolve(M.sys, s => u, t)
     u, yres, S = correct(M, upred, y)
     ll = llikelihood(M, yres, S)
@@ -59,8 +58,8 @@ function dyniterate(M::StateSpaceModel, ::Nothing, (value, c)::NamedTuple{(:valu
 end
 
 #=
-function dyniterate(M::StateSpaceModel, (s, u)::Pair, (c,)::Control)
-    t, (v, H) = c
+function dyniterate(M::StateSpaceModel, (s, u)::Pair, (v,)::Observe)
+    t, (v, H) = v
     t, upred = evolve(M.sys, s => u, t)
     u, yres, S, K = correct(JosephForm(), upred, (v, H))
     ll = llikelihood(M, yres, S)
@@ -68,13 +67,6 @@ function dyniterate(M::StateSpaceModel, (s, u)::Pair, (c,)::Control)
 end
 =#
 
-# fixme: not really clear if being an evolution means that also controlled
-# objects are evolutions
-
-function evolve(M::StateSpaceModel, U::Pair, V::Pair)
-    _, U = dyniterate(M, U, (control = V,))
-    U
-end
 
 """
     kalmanfilter(M, t => x0) -> kf
@@ -91,11 +83,11 @@ est1 = collect(kf(Y1))
 est2 = collect(kf(Y2))
 ```
 """
-kalmanfilter(M, prior) = iter -> control(iter, from(M, prior))
-kalmanfilter(M) = iter -> control(iter, M)
+kalmanfilter(M, prior) = iter -> filter(iter, from(M, prior))
+kalmanfilter(M) = iter -> filter(iter, M)
 
 function kalmanfilter(M, prior, Y)
-    P = control(Y, M)
+    P = filter(Y, M)
 
     ϕ = dyniterate(P, nothing, (value=prior,))
     ϕ === nothing && error("no observations")

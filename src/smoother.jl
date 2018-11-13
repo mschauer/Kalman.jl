@@ -35,7 +35,7 @@ function dyniterate(RTS::RauchTrungStriebel, (Gs, Gpred, state))
 end
 
 function rts_smoother(M, prior, Y)
-    P = control(Y, M)
+    P = filter(Y, M)
 
     ϕ = dyniterate(P, nothing, (value=prior,))
     ϕ === nothing && error("no observations")

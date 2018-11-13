@@ -1,6 +1,6 @@
 
 
-abstract type Observation
+abstract type Observation <: DynamicIterator
 end
 
 struct GenericLinearObservation <: Observation
@@ -18,3 +18,9 @@ end
 
 (O::LinearObservation)((x, P)::G) where {G} = G(O.H*x, O.H*P*O.H' + O.R)
 (O::LinearObservation)((x, P)::Gaussian) = Gaussian(O.H*x, O.H*P*O.H' + O.R)
+
+
+
+function dyniterate(O::LinearObservation, ::Nothing, ((t, (x, P)),)::@NT(control))
+    t => Gaussian(O.H*x, O.H*P*O.H' + O.R), nothing
+end
