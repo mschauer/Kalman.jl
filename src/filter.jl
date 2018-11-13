@@ -129,7 +129,7 @@ kalmanfilter(M) = iter -> filter(iter, M)
 function kalmanfilter(M, prior, Y)
     P = filter(Y, M)
 
-    ϕ = dyniterate(P, nothing, (value=prior,))
+    ϕ = dyniterate(P, Start(prior))
     ϕ === nothing && error("no observations")
     (t, u), state = ϕ
 

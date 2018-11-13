@@ -17,7 +17,7 @@ struct RauchTrungStriebel{T,S}
 end
 
 function dyniterate(RTS::RauchTrungStriebel, ::Nothing)
-    ϕ = dyniterate(RTS.iter, :Nothing)
+    ϕ = dyniterate(RTS.iter, nothing)
     ϕ === nothing && return nothing
     (n, U), state = ϕ
     Gs, Gpred = U[1], U[2]
@@ -37,7 +37,7 @@ end
 function rts_smoother(M, prior, Y)
     P = filter(Y, M)
 
-    ϕ = dyniterate(P, nothing, (value=prior,))
+    ϕ = dyniterate(P, Start(prior))
     ϕ === nothing && error("no observations")
     (t, u), state = ϕ
 

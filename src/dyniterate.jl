@@ -1,9 +1,4 @@
-abstract type Message
-end
 
-struct Start{T} <: Message
-    value::T
-end
 struct End{T} <: Message
     state::T
 end

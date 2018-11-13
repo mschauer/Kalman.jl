@@ -16,7 +16,7 @@ struct Filtered{T,S} <: DynamicIterator
 end
 filter(Y, P, ::Nothing) = Filtered(Y, P)
 
-function dyniterate(M::Filtered, ::Nothing, (value,)::Value)
+function dyniterate(M::Filtered, (value,)::Start)
     v, q = @returnnothing dyniterate(M.Y)
     u, p = @returnnothing dyniterate(M.P, nothing, (value = value, observation = v))
     u, (q, p)
