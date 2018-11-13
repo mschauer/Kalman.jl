@@ -19,7 +19,9 @@ function correct(SSM::LinearStateSpaceModel, u::T, y) where T
     T(x, P), yres, S
 end
 
-function correct(method::JosephForm, u::T, (v, H)::Tuple{Gaussian}) where T
+correct(O::LinearObservation, u, y) = correct(JosephForm(), u, (Gaussian(y, O.R), O.H))
+
+function correct(method::JosephForm, u::T, (v, H)::Tuple{<:Gaussian, <:Any}) where T
     x, Ppred = meancov(u)
     y, R = meancov(v)
     yres = y - H*x # innovation residual
@@ -57,6 +59,44 @@ function dyniterate(M::StateSpaceModel, ::Nothing, (value, v)::NamedTuple{(:valu
     (t => (u, upred, ll)), t => (u, ll)
 end
 
+struct Condition{T} <: Message
+    u::T
+    ll::Float64
+end
+
+function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Condition, v)
+    t, y = v
+    t, upred = evolve(O.P, s => u, t)
+    u, yres, S = correct(O, upred, y)
+    llᵒ = llikelihood(yres, S)
+    (t => u), Condition(t => u, ll + llᵒ)
+end
+
+struct Filter2{T} <: Message
+    u::T
+    ll::Float64
+end
+
+function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Filter2, v)
+    t, y = v
+    t, upred = evolve(O.P, s => u, t)
+    u, yres, S = correct(O, upred, y)
+    llᵒ = llikelihood(yres, S)
+    (t => (u, upred, ll + llᵒ)), Filter2(t => u, ll + llᵒ)
+end
+
+function dyniterate(O::LinearObservation{<:LinearEvolution}, start::Start{<:Filter2}, v)
+    ((s, u), ll) = start.value
+    t, y = v
+    t, upred = evolve(O.P, s => u, t)
+    u, yres, S = correct(O, upred, y)
+    llᵒ = llikelihood(yres, S)
+    (t => (u, upred, ll + llᵒ)), Filter2(t => u, ll + llᵒ)
+end
+
+llikelihood(yres, S) = logpdf(Gaussian(zero(yres), S), yres)
+
+
 #=
 function dyniterate(M::StateSpaceModel, (s, u)::Pair, (v,)::Observe)
     t, (v, H) = v
@@ -90,6 +130,24 @@ function kalmanfilter(M, prior, Y)
     P = filter(Y, M)
 
     ϕ = dyniterate(P, nothing, (value=prior,))
+    ϕ === nothing && error("no observations")
+    (t, u), state = ϕ
+
+    X = trajectory((t => u[1],))
+    while true
+        ϕ = dyniterate(P, state)
+        ϕ === nothing && break
+        (t, u), state = ϕ
+        push!(X, t => u[1])
+    end
+    ll = u[3]
+    X, ll
+end
+
+function kalmanfilter(O::Observation, prior, Y)
+    P = Bind(Y, O)
+
+    ϕ = dyniterate(P, Start(Filter2(prior, 0.0)))
     ϕ === nothing && error("no observations")
     (t, u), state = ϕ
 

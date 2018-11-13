@@ -4,7 +4,7 @@ struct GenericLinearEvolution{TPhi,Tb,TQ} <: AbstractEvolution
 end
 
 
-LinearHomogSystem(G0, Phi, Q, H, R) = LinearStateSpaceModel(G0, LinearEvolution(Phi, Q), LinearObservation(H, R))
+LinearHomogSystem(G0, Phi, Q, H, R) = LinearStateSpaceModel(G0, LinearEvolution(Phi, Q), LinearObservation2(H, R))
 
 function evolve(rng, s, x, t, M::LinearEvolution)
     @assert t-s == 1
@@ -35,12 +35,12 @@ function predict!(s, t, U, M::GenericLinearEvolution)
     G(Phi*mean(G) + mean(Q), Phi*cov(G)*Phi' + cov(Q)), Phi
 end
 
-function observe!(s, t, Y, M::GenericLinearObservation)
+function observe!(s, t, Y, M::GenericLinearObservation2)
     y, H, R = Y  # unpack generic observation
     t, y, H, R
 end
 
-function observe!(s, t, Y, MO::LinearObservation)
+function observe!(s, t, Y, MO::LinearObservation2)
     t, Y, MO.H, MO.R
 end
 

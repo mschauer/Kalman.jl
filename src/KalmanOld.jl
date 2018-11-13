@@ -20,7 +20,7 @@ export KalmanFilter, MappedKalmanFilter
 export track
 
 # input
-export GenericLinearObservation, GenericLinearEvolution, LinearObservation, LinearEvolution
+export GenericLinearObservation2, GenericLinearEvolution, LinearObservation2, LinearEvolution
 
 include("ellipse.jl")
 

@@ -17,12 +17,13 @@ macro NT(args...)
     :(NamedTuple{($(args)...,)})
 end
 
-
-export LinearObservation, GenericLinearObservation, Observation, Observe
-include("observation.jl")
+include("dyniterate.jl")
 
 export LinearEvolution, Evolution
 include("evolution.jl")
+
+export LinearObservation, LinearObservation2, GenericLinearObservation2, Observation, Observe
+include("observation.jl")
 
 export LinearStateSpaceModel, StateObs
 include("statespacemodel.jl")
@@ -50,7 +51,7 @@ export sample, randmvn
 export KalmanFilter, MappedKalmanFilter
 
 # input
-export GenericLinearObservation, GenericLinearEvolution, LinearObservation, LinearEvolution
+export GenericLinearObservation2, GenericLinearEvolution, LinearObservation2, LinearEvolution
 
 include("ellipse.jl")
 

@@ -29,6 +29,24 @@ function iterate(M::Filtered, (q, p)::Tuple)
 end
 
 
+struct Bind{T,S} <: DynamicIterator
+    Y::S
+    P::T
+end
+
+function dyniterate(M::Bind, start::Start)
+    v, q = @returnnothing iterate(M.Y)
+    u, p = @returnnothing dyniterate(M.P, start, v)
+    u, (q, p)
+end
+
+function iterate(M::Bind, (q, p)::Tuple)
+    v, q = @returnnothing iterate(M.Y, q)
+    u, p = @returnnothing dyniterate(M.P, p, v)
+    u, (q, p)
+end
+
+
 struct ControlledFilter{R,T,S} <: DynamicIterator
     C::R
     Y::S

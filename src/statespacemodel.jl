@@ -44,14 +44,3 @@ end
 dims(SSM) = size(SSM.H)
 
 llikelihood(SSM, yres, S) = logpdf(Gaussian(zero(yres), S), yres)
-
-
-# fixme: not really clear if being an evolution means that also controlled
-# objects are evolutions
-
-#=
-function evolve(M::StateSpaceModel, u::Pair, v::Pair)
-    _, U = dyniterate(M, u, (observation = v,))
-    u
-end
-=#

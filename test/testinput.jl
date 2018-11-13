@@ -21,8 +21,8 @@ xxf, PP, PPpred, ll = kalmanfilter!(0:n, Y, copy(X), zeros(n), zeros(n), M)
 
 prior = Gaussian(Phi*x0, Phi*P0*Phi' + Q)
 sys = LinearEvolution(Phi, 0.0, Q)
-obs = GenericLinearObservation()
-obs2 = LinearObservation(H, R)
+obs = GenericLinearObservation2()
+obs2 = LinearObservation2(H, R)
 
 M2 = LinearStateSpaceModel(sys, obs, prior)
 
