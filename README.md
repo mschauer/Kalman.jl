@@ -73,11 +73,3 @@ ll = u[3] # likelihood
 @show  X, ll
 
 ```
-
-
-## Installation
-
-```
-Pkg.clone("https://github.com/mschauer/GaussianDistributions.jl")
-Pkg.clone("https://github.com/mschauer/Kalman.jl")
-```

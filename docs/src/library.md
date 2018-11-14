@@ -3,34 +3,25 @@
 ## Linear systems
 
 ```@docs
-Kalman.LinearHomogSystem
-StatsBase.sample
+Kalman.LinearObservation
+Kalman.LinearEvolution
+Kalman.LinearStateSpaceModel
 ```
 
 ## Filtering
 
 ```@docs
 Kalman.kalmanfilter
-Kalman.observe!
-Kalman.predict!
-Kalman.correct!
-Kalman.evolve
-Kalman.kalman_kernel
+Kalman.Filtered
 ```
 
 ## Smoothing
 
 ```@docs
-Kalman.kalmanrts
+
 ```
 
 ## Iterators
 ```@docs
-Kalman.KalmanFilter
-Kalman.MappedKalmanFilter
-```
-
-## Tracking
-```@docs
-Kalman.track
+DynamicIterators.dyniterate
 ```
