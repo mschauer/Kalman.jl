@@ -2,4 +2,5 @@
 *.jl.*.cov
 *.jl.mem
 example/data
+data
 *.ipynb_checkpoints

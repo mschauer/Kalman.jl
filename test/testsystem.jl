@@ -2,11 +2,16 @@
 x0 = 1.0
 P0 = 1.0
 
-Phi = -1.0
+Φ = 0.5
 b = 0.0
-Q = 1.0
+Q = 2.0
 
-yshadow = NaN
+yshadow = 0.0
 H = 1.0
 R = 1.0
-M = LinearHomogSystem(x0, P0, Phi, b, Q, yshadow, H, R)
+
+E = LinearEvolution(Φ, Gaussian(b, Q))
+Obs = LinearObservationModel(H, R)
+M = LinearStateSpaceModel(E, Obs)
+
+O = LinearObservation(LinearEvolution(Φ, Gaussian(b, Q)), H, R)

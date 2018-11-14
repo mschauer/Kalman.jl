@@ -1,21 +1,22 @@
 include("testsystem.jl")
 Random.seed!(11)
 G0 = Gaussian(x0, P0)
-x = rand(StateObs(G0, M.obs))
+x = rand(StateObs(Φ*G0, M.obs))
 X = trace(DynamicIterators.Sampled(M), 1 => x, endtime(3))
 @show x
 
 Y = collect(t=>y for (t, (x,y)) in pairs(X))
 @show Y
 
-Xf, ll = kalmanfilter(M, 1 => G0, Y)
+Xf, ll = kalmanfilter(M, 0 => G0, Y)
 
-Xs, ll = rts_smoother(M, 1 => G0, Y)
+Xs, ll = rts_smoother(M, 0 => G0, Y)
 @show Xs
 
 QL = sqrt(Q)
 
-P0L = sqrt(P0)
+P0L = sqrt(Φ*P0*Φ' + Q)
+x0 = Φ*x0
 
 RL = sqrt(R)
 
