@@ -18,3 +18,5 @@ include("testobservation.jl")
 include("testkalman1.jl")
 include("testkalman2.jl")
 include("testsmoother.jl")
+
+include("../example/readme.jl")

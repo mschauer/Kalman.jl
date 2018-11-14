@@ -69,26 +69,26 @@ function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Condi
     (t => u), Condition(t => u, ll + llᵒ)
 end
 
-struct Filter2{T} <: Message
+struct Filter{T} <: Message
     u::T
     ll::Float64
 end
 
-function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Filter2, v)
+function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Filter, v)
     t, y = v
     t, upred = evolve(O.P, s => u, t)
     u, yres, S = correct(O, upred, y)
     llᵒ = llikelihood(yres, S)
-    (t => (u, upred, ll + llᵒ)), Filter2(t => u, ll + llᵒ)
+    (t => (u, upred, ll + llᵒ)), Filter(t => u, ll + llᵒ)
 end
 
-function dyniterate(O::LinearObservation{<:LinearEvolution}, start::Start{<:Filter2}, v)
+function dyniterate(O::LinearObservation{<:LinearEvolution}, start::Start{<:Filter}, v)
     ((s, u), ll) = start.value
     t, y = v
     t, upred = evolve(O.P, s => u, t)
     u, yres, S = correct(O, upred, y)
     llᵒ = llikelihood(yres, S)
-    (t => (u, upred, ll + llᵒ)), Filter2(t => u, ll + llᵒ)
+    (t => (u, upred, ll + llᵒ)), Filter(t => u, ll + llᵒ)
 end
 
 llikelihood(yres, S) = logpdf(Gaussian(zero(yres), S), yres)
@@ -144,7 +144,7 @@ end
 function kalmanfilter(O::Observation, prior, Y)
     P = Bind(Y, O)
 
-    ϕ = dyniterate(P, Start(Filter2(prior, 0.0)))
+    ϕ = dyniterate(P, Start(Filter(prior, 0.0)))
     ϕ === nothing && error("no observations")
     (t, u), state = ϕ
 
