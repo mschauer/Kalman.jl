@@ -42,27 +42,24 @@ Return filtered state `t => (x, P)` and predicted `(xpred, Ppred)`.
 
 Computes and returns as well the log likelihood of the residual.
 """
-function dyniterate(M::StateSpaceModel, (s, (u,ll))::Pair, (v,)::Observe)
+function dyniterate(M::StateSpaceModel, ((s, u), ll)::Condition{<:Pair}, v)
     t, y = v
     t, upred = evolve(M.sys, s => u, t)
     u, yres, S = correct(M, upred, y)
     llᵒ = llikelihood(M, yres, S)
-    (t => (u, upred, ll + llᵒ)), t => (u, ll + llᵒ)
+    (t => (u, upred, ll + llᵒ)), Condition(t => u, ll + llᵒ)
 end
 
-function dyniterate(M::StateSpaceModel, (value,)::Start, (v,)::Observe)
+function dyniterate(M::StateSpaceModel, ((value,), dummy)::Condition{<:Start}, v)
     s, u = value
     t, y = v
     t, upred = evolve(M.sys, s => u, t)
     u, yres, S = correct(M, upred, y)
     ll = llikelihood(M, yres, S)
-    (t => (u, upred, ll)), t => (u, ll)
+    (t => (u, upred, ll)), Condition(t => u, ll)
 end
 
-struct Condition{T} <: Message
-    u::T
-    ll::Float64
-end
+
 
 function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Condition, v)
     t, y = v

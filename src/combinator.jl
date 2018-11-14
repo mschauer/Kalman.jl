@@ -14,39 +14,23 @@ struct Filtered{T,S} <: DynamicIterator
     Y::S
     P::T
 end
-filter(Y, P, ::Nothing) = Filtered(Y, P)
+#filter(Y, P, ::Nothing) = Filtered(Y, P)
+filter(Y, P) = Filtered(Y, P)
 
 function dyniterate(M::Filtered, start::Start)
     v, q = @returnnothing dyniterate(M.Y, nothing)
-    u, p = @returnnothing dyniterate(M.P, start, (observation = v,))
+    u, p = @returnnothing dyniterate(M.P, Condition(start, 0.0), v)
     u, (q, p)
 end
 
 function iterate(M::Filtered, (q, p)::Tuple)
-    v, q = @returnnothing iterate(M.Y, q)
-    u, p = @returnnothing dyniterate(M.P, p, (observation = v,))
-    u, (q, p)
-end
-
-
-struct Bind{T,S} <: DynamicIterator
-    Y::S
-    P::T
-end
-
-function dyniterate(M::Bind, start::Start)
-    v, q = @returnnothing iterate(M.Y)
-    u, p = @returnnothing dyniterate(M.P, start, v)
-    u, (q, p)
-end
-
-function iterate(M::Bind, (q, p)::Tuple)
     v, q = @returnnothing iterate(M.Y, q)
     u, p = @returnnothing dyniterate(M.P, p, v)
     u, (q, p)
 end
 
 
+#=
 struct ControlledFilter{R,T,S} <: DynamicIterator
     C::R
     Y::S
@@ -70,3 +54,4 @@ function iterate(M::ControlledFilter, (u, r, q, p)::Tuple)
     u, p = @returnnothing dyniterate(M.P, p, (control = w, observation = v))
     u, (u, r, q, p)
 end
+=#
