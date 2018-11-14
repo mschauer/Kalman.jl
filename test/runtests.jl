@@ -11,7 +11,6 @@ using Trajectories
 
 Random.seed!(1)
 
-include("testmisc.jl")
 
 include("testevolution.jl")
 include("testobservation.jl")
@@ -22,3 +21,5 @@ include("testkalman2.jl")
 include("testsmoother.jl")
 
 include("../example/readme.jl")
+
+# include("testmisc.jl") fixed on master
