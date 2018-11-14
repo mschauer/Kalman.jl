@@ -18,7 +18,6 @@ makedocs(
 # for more information.
 deploydocs(
     repo = "github.com/mschauer/Kalman.jl.git",
-    julia  = "0.6",
     target = "build",
     deps = nothing,
     make = nothing,
