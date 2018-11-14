@@ -4,8 +4,9 @@
 
 
 # Kalman
-
-`Kalman.jl` uses `DynamicIterators` to implement online Kalman filtering.
+Flexible filtering and smoothing in Julia. `Kalman` uses [`DynamicIterators`](https://github.com/mschauer/DynamicIterators.jl) (an iterator protocol for dynamic data dependent and controlled processes) and
+[`GaussianDistributions`](https://github.com/mschauer/GaussianDistributions.jl) (Gaussian distributions as abstraction for the uncertain state)
+to implement flexible online Kalman filtering.
 
 ## Example
 
