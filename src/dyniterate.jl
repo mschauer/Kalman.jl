@@ -1,16 +1,4 @@
 
-struct End{T} <: Message
-    state::T
-end
-
-struct Parent{T, S} <: Message
-    state::T
-    parent::S
-end
-
-struct Evolve{T} <: Message
-    state::T
-end
 
 struct Trace{T,S,F} <: Message
     start::T
@@ -18,8 +6,7 @@ struct Trace{T,S,F} <: Message
     stop::F
 end
 
-import DynamicIterators: trace
-function trace(iter, (start, X, stop)::Trace)
+function collecttrace(iter, (start, X, stop)::Trace)
     ϕ = dyniterate(iter, start)
     ϕ === nothing && return X
     x, u = ϕ
@@ -33,4 +20,4 @@ function trace(iter, (start, X, stop)::Trace)
     return X
 end
 
-export Start, Trace, Sample
+export Trace, collecttrace

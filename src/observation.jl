@@ -27,8 +27,6 @@ struct LinearObservation{T, TH, TR} <: Observation
 end
 
 
-
-
 function dyniterate(O::LinearObservation, u)
     (t, x, P), u = @returnnothing dyniterate(O.P, u)
     t => Gaussian(O.H*x, O.H*P*O.H' + O.R), u
@@ -37,11 +35,4 @@ end
 function dyniterate(O::LinearObservation, u::Sample)
     (t, x), u = @returnnothing dyniterate(O.P, u)
     t => rand(u.rng, Gaussian(O.H*x, O.R)), u
-end
-
-function dyniterate(E::LinearEvolution, (u, rng)::Sample)
-    ϕ = evolve(E, u)
-    (t, u) = ϕ
-    x = rand(rng, u)
-    t => x, Sample(t => x, rng)
 end
