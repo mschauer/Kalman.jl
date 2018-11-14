@@ -10,5 +10,5 @@ H = [1.0 0.0]
 R = Matrix(1.0I, 1, 1)
 
 E = LinearEvolution(Φ, Gaussian(b, Q))
-Obs = LinearObservation2(H, R)
+Obs = LinearObservationModel(H, R)
 M = LinearStateSpaceModel(E, Obs)

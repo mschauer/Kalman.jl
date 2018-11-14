@@ -6,7 +6,7 @@ At the moment implements the vanilla Kalman filter, but the layout allows for ea
 
 ```@docs
 Kalman.LinearEvolution
-Kalman.LinearObservation2
+Kalman.LinearObservationModel
 Kalman.kalmanfilter!
 ```@docs
 

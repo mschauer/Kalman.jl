@@ -3,20 +3,20 @@
 abstract type Observation <: DynamicIterator
 end
 
-struct GenericLinearObservation2 <: Observation
+struct GenericLinearObservationModel <: Observation
 end
 
 
-struct LinearObservation2{TH, TR} <: Observation
+struct LinearObservationModel{TH, TR} <: Observation
     H::TH # dxd
     R::TR # d
 end
 
-(O::LinearObservation2)((x, P)::G) where {G} = G(O.H*x, O.H*P*O.H' + O.R)
-(O::LinearObservation2)((x, P)::Gaussian) = Gaussian(O.H*x, O.H*P*O.H' + O.R)
+(O::LinearObservationModel)((x, P)::G) where {G} = G(O.H*x, O.H*P*O.H' + O.R)
+(O::LinearObservationModel)((x, P)::Gaussian) = Gaussian(O.H*x, O.H*P*O.H' + O.R)
 
 """
-    LinearObservation2(H, R)
+    LinearObservationModel(H, R)
 
 Observe `y = Hx + v` where ``v ~ N(0, R)``
 """

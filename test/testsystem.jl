@@ -11,7 +11,7 @@ H = 1.0
 R = 1.0
 
 E = LinearEvolution(Φ, Gaussian(b, Q))
-Obs = LinearObservation2(H, R)
+Obs = LinearObservationModel(H, R)
 M = LinearStateSpaceModel(E, Obs)
 
 O = LinearObservation(LinearEvolution(Φ, Gaussian(b, Q)), H, R)

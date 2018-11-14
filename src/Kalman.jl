@@ -22,7 +22,7 @@ include("dyniterate.jl")
 export LinearEvolution, Evolution
 include("evolution.jl")
 
-export LinearObservation, LinearObservation2, GenericLinearObservation2, Observation, Observe
+export LinearObservation, LinearObservationModel, GenericLinearObservationModel, Observation, Observe
 include("observation.jl")
 
 export LinearStateSpaceModel, StateObs
@@ -51,7 +51,7 @@ export sample, randmvn
 export KalmanFilter, MappedKalmanFilter
 
 # input
-export GenericLinearObservation2, GenericLinearEvolution, LinearObservation2, LinearEvolution
+export GenericLinearObservationModel, GenericLinearEvolution, LinearObservationModel, LinearEvolution
 
 include("ellipse.jl")
 
