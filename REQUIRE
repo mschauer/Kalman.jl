@@ -3,4 +3,4 @@ julia 0.7
 Distributions
 GaussianDistributions
 Trajectories
-DynamicIterators
+DynamicIterators 0.2
