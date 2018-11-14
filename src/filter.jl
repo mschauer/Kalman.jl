@@ -50,7 +50,7 @@ function dyniterate(M::StateSpaceModel, (s, (u,ll))::Pair, (v,)::Observe)
     (t => (u, upred, ll + llᵒ)), t => (u, ll + llᵒ)
 end
 
-function dyniterate(M::StateSpaceModel, ::Nothing, (value, v)::NamedTuple{(:value, :observation)})
+function dyniterate(M::StateSpaceModel, (value,)::Start, (v,)::Observe)
     s, u = value
     t, y = v
     t, upred = evolve(M.sys, s => u, t)

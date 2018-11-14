@@ -10,6 +10,6 @@ Y = trajectory(trace(LinearObservation(LinearEvolution(Φ, Gaussian(b, Q)), H, R
 
 Random.seed!(11)
 x = rand(StateObs(Gaussian(x0, P0), M.obs))
-X = trace(DynamicIterators.Sample(M), 1 => x, endtime(10))
+X = trace(DynamicIterators.Sample2(M), 1 => x, endtime(10))
 
 @test Trajectory(X.t, last.(X.x)) == Y

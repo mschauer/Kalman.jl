@@ -26,7 +26,7 @@ function evolve(M::LinearEvolution, x)
 end
 
 
-function evolve(M::GenericLinearEvolution, G, (control,)::Control)
+function evolve(M::GenericLinearEvolution, (G,)::Control, control)
     Φ, Q = control
     G(Φ*mean(G) + mean(Q), Φ*cov(G)*Φ' + cov(Q))
 end

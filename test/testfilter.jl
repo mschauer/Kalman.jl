@@ -2,7 +2,7 @@
 include("testsystem.jl")
 Random.seed!(11)
 x = rand(StateObs(Gaussian(x0, P0), M.obs))
-X = trace(DynamicIterators.Sample(M), 1 => x, endtime(100))
+X = trace(DynamicIterators.Sample2(M), 1 => x, endtime(100))
 
 
 

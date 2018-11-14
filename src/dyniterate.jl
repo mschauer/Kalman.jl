@@ -7,12 +7,6 @@ struct Parent{T, S} <: Message
     state::T
     parent::S
 end
-struct Sample{T,RNG} <: Message
-    state::T
-    rng::RNG
-end
-
-Sample(x) = Sample(x, Random.GLOBAL_RNG)
 
 struct Evolve{T} <: Message
     state::T
@@ -23,9 +17,6 @@ struct Trace{T,S,F} <: Message
     X::S
     stop::F
 end
-
-iterate(M::Message) = getfield(M, 1), 1
-iterate(M::Message, n) = getfield(M, n + 1), n + 1
 
 import DynamicIterators: trace
 function trace(iter, (start, X, stop)::Trace)
