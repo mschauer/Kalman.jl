@@ -12,7 +12,11 @@ import Random.rand
 meancov(G) = mean(G), cov(G)
 meancov(G::Tuple) = G
 
-struct Condition{T} <: Message
+struct Condition{T} <: Message2
+    u::T
+    ll::Float64
+end
+struct Filter{T} <: Message2
     u::T
     ll::Float64
 end

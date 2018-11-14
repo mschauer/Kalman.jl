@@ -69,10 +69,6 @@ function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Condi
     (t => u), Condition(t => u, ll + llᵒ)
 end
 
-struct Filter{T} <: Message
-    u::T
-    ll::Float64
-end
 
 function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Filter, v)
     t, y = v

@@ -6,7 +6,10 @@ struct Trace{T,S,F} <: Message
     stop::F
 end
 
-function collecttrace(iter, (start, X, stop)::Trace)
+function collecttrace(iter, t::Trace)
+    start = t.start
+    X = t.X
+    stop = t.stop
     ϕ = dyniterate(iter, start)
     ϕ === nothing && return X
     x, u = ϕ
