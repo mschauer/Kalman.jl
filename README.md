@@ -18,6 +18,9 @@ For the state space system
 define
 
 ```julia
+using GaussianDistributions
+using DynamicIterators
+
 # Define linear evolution
 Φ = [0.8 0.5; -0.1 0.8]
 b = zeros(2)

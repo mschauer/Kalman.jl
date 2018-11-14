@@ -23,7 +23,7 @@ function dyniterate(M::Filtered, start::Start)
     u, (q, p)
 end
 
-function iterate(M::Filtered, (q, p)::Tuple)
+function dyniterate(M::Filtered, (q, p)::Tuple)
     v, q = @returnnothing iterate(M.Y, q)
     u, p = @returnnothing dyniterate(M.P, p, v)
     u, (q, p)

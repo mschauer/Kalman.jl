@@ -7,9 +7,11 @@ using GaussianDistributions
 using DynamicIterators
 using Trajectories
 
-include(joinpath("..", "docs", "make.jl"))
+#include(joinpath("..", "docs", "make.jl"))
 
 Random.seed!(1)
+
+include("testmisc.jl")
 
 include("testevolution.jl")
 include("testobservation.jl")
