@@ -53,27 +53,43 @@ As said, filtering is implemented via the DynamicIterator protocol. It is worthw
 a possible the implementation of `kalmanfilter` to see how filtering can be integrated into online algorithms (run in a local scope to avoid `UndefVarError: ystate not defined`.)
 
 ```julia
+# `Y` is the data iterator, iterating over pairs of  `t => v` of time `t` and observation `v`
+# `O` is the dynamical filter iterator, iterating over pairs `t => u` where
+#     u::Tuple{<:Gaussian,<:Gaussian,Float64}
+# is the tuple of filtered state, the predicted state and the log likelihood
+
+# Initialise data iterator
+
 ϕ = iterate(Y)
 ϕ === nothing && error("no observations")
-y, ystate = ϕ
+(t, v), ystate = ϕ
 
-ϕ = dyniterate(O, Start(Kalman.Filter(prior, 0.0)), y)
+# Initialise dynamical filter with first data point `t => v`
+# and the `prior::Pair{Int,<:Gaussian}`, a pair of initial time and initial state
+
+ϕ = dyniterate(O, Start(Kalman.Filter(prior, 0.0)), t => v)
 ϕ === nothing && error("no observations")
 (t, u), state = ϕ
 
 X = trajectory((t => u[1],))
 while true
+
+    # Advance data iterator
+    
     ϕ = iterate(Y, ystate)
     ϕ === nothing && break
-    y, ystate = ϕ
+    (t, v), ystate = ϕ
 
-    ϕ = dyniterate(O, state, y)
+    # Advance filter with new data `t => v`
+    
+    ϕ = dyniterate(O, state, t => v)
     ϕ === nothing && break
     (t, u), state = ϕ
-    push!(X, t => u[1]) # filtered state as Gaussian
-                        # the second argument is predicted state
+    
+    # Do something with the result `t => u` (here: saving it)
+    
+    push!(X, t => u[1]) # save filtered state
 end
 ll = u[3] # likelihood
 @show  X, ll
-
 ```
