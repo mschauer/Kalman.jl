@@ -6,7 +6,11 @@ end
 struct GenericLinearObservationModel <: Observation
 end
 
+"""
+    LinearObservationModel(H, R)
 
+Observe `y = Hx + v` where ``v \\sim N(0, R)``.
+"""
 struct LinearObservationModel{TH, TR} <: Observation
     H::TH # dxd
     R::TR # d
@@ -16,9 +20,15 @@ end
 (O::LinearObservationModel)((x, P)::Gaussian) = Gaussian(O.H*x, O.H*P*O.H' + O.R)
 
 """
-    LinearObservationModel(H, R)
+    LinearObservation(P, H, R)
 
-Observe `y = Hx + v` where ``v ~ N(0, R)``
+Observe the LinearEvolution `P` using `y = Hx + v`
+where ``v \\sim N(0, R)``.
+
+# Examples
+```
+    O = LinearObservation(LinearEvolution(Φ, Gaussian(b, Q)), H, R)
+```
 """
 struct LinearObservation{T, TH, TR} <: Observation
     P::T

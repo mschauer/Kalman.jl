@@ -8,6 +8,7 @@ import DynamicIterators: evolve, dyniterate, @returnnothing
 import Base: iterate, IteratorSize, IteratorEltype, eltype, length
 
 import Random.rand
+import GaussianDistributions: ⊕
 
 meancov(G) = mean(G), cov(G)
 meancov(G::Tuple) = G

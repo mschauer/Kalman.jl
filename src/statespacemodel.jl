@@ -24,7 +24,7 @@ LinearStateSpaceModel(sys, obs)
 Combines a linear system `sys` and an observations model `obs` and
 to a linear statespace model in a modular way.
 
-Evolves StateObs objects.
+Evolves `StateObs` objects.
 """
 struct LinearStateSpaceModel{Tsys,Tobs} <: StateSpaceModel
     sys::Tsys
