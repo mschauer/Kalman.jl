@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Library",
     "title": "Kalman.LinearObservation",
     "category": "type",
-    "text": "LinearObservationModel(H, R)\n\nObserve y = Hx + v where v  N(0 R)\n\n\n\n\n\n"
+    "text": "LinearObservation(P, H, R)\n\nObserve the LinearEvolution P using y = Hx + v where v sim N(0 R).\n\nExamples\n\n    O = LinearObservation(LinearEvolution(Φ, Gaussian(b, Q)), H, R)\n\n\n\n\n\n"
 },
 
 {
@@ -45,7 +45,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Library",
     "title": "Kalman.LinearEvolution",
     "category": "type",
-    "text": "LinearEvolution(Φ, b, Q)\n\nEvolution of the law of x -> Φ x + w where w  N(0 Q)\n\n\n\n\n\n"
+    "text": "LinearEvolution(Φ, b, Q) <: Evolution\n\nEvolution of the law of x -> Φ x + w where w sim N(0 Q).\n\nExamples\n\n    evolve(LinearEvolution(Φ, b, Q), 0 => Gaussian(x, P))\n\n\n\n\n\n"
 },
 
 {
