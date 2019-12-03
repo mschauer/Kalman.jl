@@ -43,4 +43,4 @@ end
 
 dims(SSM) = size(SSM.H)
 
-llikelihood(SSM, yres, S) = logpdf(Gaussian(zero(yres), S), yres)
+llikelihood(::LinearStateSpaceModel, yres, S) = logpdf(Gaussian(zero(yres), symmetrize!(S)), yres)
