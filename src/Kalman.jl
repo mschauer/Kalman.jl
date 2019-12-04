@@ -13,6 +13,10 @@ import GaussianDistributions: ⊕
 meancov(G) = mean(G), cov(G)
 meancov(G::Tuple) = G
 
+symmetrize!(A::Symmetric) = A
+symmetrize!(A) = Symmetric(A)
+symmetrize!(A::Number) = A
+
 struct Condition{T} <: Message2
     u::T
     ll::Float64

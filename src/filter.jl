@@ -65,7 +65,7 @@ function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Condi
     t, y = v
     t, upred = evolve(O.P, s => u, t)
     u, yres, S = correct(O, upred, y)
-    llᵒ = llikelihood(yres, S)
+    llᵒ = llikelihood(O, yres, S)
     (t => u), Condition(t => u, ll + llᵒ)
 end
 
@@ -74,7 +74,7 @@ function dyniterate(O::LinearObservation{<:LinearEvolution}, ((s, u), ll)::Filte
     t, y = v
     t, upred = evolve(O.P, s => u, t)
     u, yres, S = correct(O, upred, y)
-    llᵒ = llikelihood(yres, S)
+    llᵒ = llikelihood(O, yres, S)
     (t => (u, upred, ll + llᵒ)), Filter(t => u, ll + llᵒ)
 end
 
@@ -83,11 +83,12 @@ function dyniterate(O::LinearObservation{<:LinearEvolution}, start::Start{<:Filt
     t, y = v
     t, upred = evolve(O.P, s => u, t)
     u, yres, S = correct(O, upred, y)
-    llᵒ = llikelihood(yres, S)
+    llᵒ = llikelihood(O, yres, S)
     (t => (u, upred, ll + llᵒ)), Filter(t => u, ll + llᵒ)
 end
 
-llikelihood(yres, S) = logpdf(Gaussian(zero(yres), S), yres)
+llikelihood(yres, S) = logpdf(Gaussian(zero(yres), symmetrize!(S)), yres)
+llikelihood(_, yres, S) = logpdf(Gaussian(zero(yres), symmetrize!(S)), yres)
 
 
 #=
