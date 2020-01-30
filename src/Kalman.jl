@@ -17,13 +17,13 @@ symmetrize!(A::Symmetric) = A
 symmetrize!(A) = Symmetric(A)
 symmetrize!(A::Number) = A
 
-struct Condition{T} <: Message2
+struct Condition{T,S} <: Message2
     u::T
-    ll::Float64
+    ll::S
 end
-struct Filter{T} <: Message2
+struct Filter{T,S} <: Message2
     u::T
-    ll::Float64
+    ll::S
 end
 
 macro NT(args...)
