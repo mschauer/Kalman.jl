@@ -62,6 +62,8 @@ plot!(p1, 0:N, [mean(p)[2] for p in ps], color="blue", label="filtered x2", grid
 savefig(p1, "filter.png")
 ```
 
+![Filtered trajectory with uncertainty](https://raw.githubusercontent.com/mschauer/Kalman.jl/master/filter.png)
+
 
 
 ## Interface
