@@ -15,10 +15,10 @@ The package provides tools to filter and smooth and conditionally sample the sta
     y[k] = Hx[k] + v[k],    v[k] ∼ N(0, R)
 
 ## How to use
-One way, and maybe the way to use this package is to call `Kalman.correct` to implement the correction step in a Kalman filter:
+One way, and maybe the way to use this package is to use `Gaussian` from `GaussianDistributions.jl` as representation of mean and uncertainty of a filter and call `Kalman.correct` to implement the correction step in a Kalman filter:
 ```julia
 using Kalman, GaussianDistributions, LinearAlgebra
-using GaussianDistributions: ⊕
+using GaussianDistributions: ⊕ # independent sum of Gaussian r.v.
 using Statistics
 
 # prior for time 0
@@ -38,19 +38,18 @@ R = Matrix(0.3I, 1, 1)
 ys = [[-1.77], [-0.78], [-1.28], [-1.06], [-3.65], [-2.47], [-0.06], [-0.91], [-0.80], [1.48]]
 
 
-# filter
-# assuming first observation at time 1
+# filter (assuming first observation at time 1)
 N = length(ys)
 
 p = Gaussian(x0, P0)
 ps = [p] # vector of filtered Gaussians
 for i in 1:N
     global p
-    #predict
-    p = Φ*p ⊕ Gaussian(zero(x0), Q) #Gaussian(Φμ, ΦΣΦ' + Q)
+    # predict
+    p = Φ*p ⊕ Gaussian(zero(x0), Q) #same as Gaussian(Φ*p.μ, Φ*p.Σ*Φ' + Q)
     # correct
     p, yres, _ = Kalman.correct(Kalman.JosephForm(), p, (Gaussian(ys[i], R), H))
-    push!(ps, p) # filtered density
+    push!(ps, p) # save filtered density
 end
 
 using Plots
