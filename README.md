@@ -15,7 +15,7 @@ The package provides tools to filter and smooth and conditionally sample the sta
     y[k] = Hx[k] + v[k],    v[k] ∼ N(0, R)
 
 ## How to use
-One way, and maybe the way to use this package is to use `Gaussian` from `GaussianDistributions.jl` as representation of mean and uncertainty of a filter and call `Kalman.correct` to implement the correction step in a Kalman filter:
+One way, and maybe *the* way, to use this package is to use `Gaussian` from `GaussianDistributions.jl` as representation of mean and uncertainty of a filter and call `Kalman.correct` to implement the correction step in a Kalman filter:
 ```julia
 using Kalman, GaussianDistributions, LinearAlgebra
 using GaussianDistributions: ⊕ # independent sum of Gaussian r.v.
