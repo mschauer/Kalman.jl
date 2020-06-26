@@ -50,3 +50,12 @@ ll2 = logpdf(Gaussian(μ[o], Σ[o, o]), v)
 @test Σs ≈ cov.(values(Xs))
 
 @test ll ≈ ll2
+
+
+# test backward sampler
+
+X1 = [Kalman.backward_sampler(M, 1 => G0, Y).x[1] for k in 1:1000]
+
+
+@test norm(mean(X1) - mean(Xs.x[1])) < 0.005
+@test norm(cov(X1) - cov(Xs.x[1])) < 0.0025
