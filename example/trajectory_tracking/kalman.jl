@@ -41,7 +41,7 @@ for i in 1:n
     pp = F*pp ⊕ Gaussian(zero(x0), Q) #same as Gaussian(Φ*p.μ, Φ*p.Σ*Φ' + Q)
     # observe
     p, v = onestep(p, v)
-    xobs = copy(p)
+    xobs = p + @SVector randn(2)
     push!(obs, xobs)
     # correct
     pp, yres, _ = Kalman.correct(Kalman.JosephForm(), pp, (Gaussian(xobs, R), H))
@@ -68,4 +68,3 @@ on(p) do pp
     limits!(ax, xlim..., ylim...)
 end
 fig
-
