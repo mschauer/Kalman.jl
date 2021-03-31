@@ -4,10 +4,11 @@ using Statistics
 using GLMakie
 using StaticArrays
 
-function onestep!(p, v)
-    v .+= randn(2)
-    w = randn(2)
-    p .+= v + w
+function onestep(p, v)
+    v += @SVector randn(2)
+    w = @SVector randn(2)
+    p += v + w
+    p, v
 end
 
 x0 = zero(SVector{4, Float64})  #start point
@@ -67,5 +68,4 @@ on(p) do pp
     limits!(ax, xlim..., ylim...)
 end
 fig
-
 
