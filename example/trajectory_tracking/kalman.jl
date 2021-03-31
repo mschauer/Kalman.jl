@@ -39,7 +39,7 @@ for i in 1:n
     # predict
     pp = F*pp ⊕ Gaussian(zero(x0), Q) #same as Gaussian(Φ*p.μ, Φ*p.Σ*Φ' + Q)
     # observe
-    onestep!(p, v)
+    p, v = onestep(p, v)
     xobs = copy(p)
     push!(obs, xobs)
     # correct
@@ -67,7 +67,6 @@ on(p) do pp
     limits!(ax, xlim..., ylim...)
 end
 fig
-
 
 
 
