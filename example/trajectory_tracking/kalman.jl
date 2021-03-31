@@ -27,7 +27,7 @@ Q = SMatrix{4,4}(Diagonal([0.01, 0.01, 0.1, 0.1]))
 R = SMatrix{2,2,Float64}(I)
 
 
-p = zeros(2) # initial poistion
+p = @SVector zeros(2) # initial poistion
 v = ones(2) # initial velocity
 n = 100
 
@@ -67,6 +67,5 @@ on(p) do pp
     limits!(ax, xlim..., ylim...)
 end
 fig
-
 
 
