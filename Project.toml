@@ -12,7 +12,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Trajectories = "2c80a279-213e-54d7-a557-e9a14725db56"
 
 [compat]
-Distributions = "0.20, 0.21, 0.23"
+Distributions = "0.20, 0.21, 0.23, 0.24"
 DynamicIterators = "0"
 GaussianDistributions = "0.3, 0.4, 0.5"
 Trajectories = "0.2"
