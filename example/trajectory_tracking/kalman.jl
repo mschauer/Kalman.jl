@@ -29,7 +29,7 @@ R = SMatrix{2,2,Float64}(I)
 
 
 p = @SVector zeros(2) # initial poistion
-v = ones(2) # initial velocity
+v = @SVector ones(2) # initial velocity
 n = 100
 
 pp = Gaussian(x0, P)
