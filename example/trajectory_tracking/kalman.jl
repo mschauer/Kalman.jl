@@ -6,7 +6,7 @@ using StaticArrays
 
 function onestep(p, v)
     v += @SVector randn(2)
-    w = @SVector randn(2)
+    w = @SVector 0.1*randn(2)
     p += v + w
     p, v
 end
