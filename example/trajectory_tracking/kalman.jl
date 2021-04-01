@@ -6,7 +6,7 @@ using StaticArrays
 
 function onestep(p, v)
     v += @SVector randn(2)
-    w = @SVector 0.1*randn(2)
+    w = 0.1 * @SVector randn(2)
     p += v + w
     p, v
 end
@@ -36,7 +36,7 @@ pp = Gaussian(x0, P)
 ps = [pp] # vector of filtered Gaussians
 obs = Point2f0[]
 for i in 1:n
-    global pp
+    global pp, p, v
     # predict
     pp = F*pp ⊕ Gaussian(zero(x0), Q) #same as Gaussian(Φ*p.μ, Φ*p.Σ*Φ' + Q)
     # observe
