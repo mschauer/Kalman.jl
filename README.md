@@ -63,7 +63,7 @@ savefig(p1, "filter.png")
 
 ![Filtered trajectory with uncertainty](https://raw.githubusercontent.com/mschauer/Kalman.jl/master/filter.png)
 
-
+A very similar example of tracking a 2D trajectory can be found [here](example/trajectory_tracking/kalman.jl).
 
 ## Interface
 
