@@ -70,8 +70,7 @@ A very similar example of tracking a 2D trajectory can be found [here](example/t
 The same might be achieved using interface functions
 
 ```julia
-using GaussianDistributions
-using DynamicIterators
+using DynamicIterators, GaussianDistributions, Kalman, LinearAlgebra
 
 # Define linear evolution
 Φ = [0.8 0.5; -0.1 0.8]
@@ -117,12 +116,13 @@ a possible the implementation of `kalmanfilter` to see how filtering can be inte
 
 # Initialise dynamical filter with first data point `t => v`
 # and the `prior::Pair{Int,<:Gaussian}`, a pair of initial time and initial state
+prior = 0 => Gaussian(x0, P0)
 
 ϕ = dyniterate(O, Start(Kalman.Filter(prior, 0.0)), t => v)
 ϕ === nothing && error("no observations")
 (t, u), state = ϕ
 
-X = trajectory((t => u[1],))
+X = [t => u[1]]
 while true
 
     # Advance data iterator
