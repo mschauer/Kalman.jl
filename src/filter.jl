@@ -34,6 +34,22 @@ function correct(method::JosephForm, u::T, (v, H)::Tuple{<:Gaussian, <:Any}) whe
     T(x, P), yres, S
 end
 
+function correct(method::JosephForm, u::T, (v, H)::Tuple{<:Gaussian, <:LinearMap}) where T
+    println("Here")
+    x, Ppred = meancov(u)
+    y, R = meancov(v)
+    yres = y - H*x # innovation residual
+    HP = Matrix(H*Ppred)
+
+    S = Matrix(H*HP')' + R # innovation covariance
+
+    K = Matrix(H*Ppred')'/S # Kalman gain
+    x = x + K*yres
+    A = I - Matrix(K*H)
+    P = A*Ppred*A' + K*R*K'
+    T(x, P), yres, S
+end
+
 """
 
 Single Kalman filter with control being the observation, consisting of a prediction step
