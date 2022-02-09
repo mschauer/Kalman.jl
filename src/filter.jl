@@ -35,7 +35,6 @@ function correct(method::JosephForm, u::T, (v, H)::Tuple{<:Gaussian, <:Any}) whe
 end
 
 function correct(method::JosephForm, u::T, (v, H)::Tuple{<:Gaussian, <:LinearMap}) where T
-    println("Here")
     x, Ppred = meancov(u)
     y, R = meancov(v)
     yres = y - H*x # innovation residual
