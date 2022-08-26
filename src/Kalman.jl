@@ -9,6 +9,7 @@ import Base: iterate, IteratorSize, IteratorEltype, eltype, length
 
 import Random.rand
 import GaussianDistributions: ⊕
+using LinearMaps
 
 meancov(G) = mean(G), cov(G)
 meancov(G::Tuple) = G
