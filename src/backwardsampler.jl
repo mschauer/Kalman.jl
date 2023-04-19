@@ -1,5 +1,5 @@
 
-function backward_rand_kernel(x, Gf, Gpred, Φ) where T
+function backward_rand_kernel(x, Gf, Gpred, Φ)
     xf, Pf = meancov(Gf)
     xpred, Ppred = meancov(Gpred)
 
